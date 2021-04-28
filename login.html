@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://sdk.amazonaws.com/js/aws-sdk-2.244.1.min.js"></script>
+</head>
+<style>
+.button {
+    padding: 10px;
+}
+</style>
+<body>
+    <div id="results">data</div>
+    <form action="/action_page.php">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username"><br><br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password"><br><br>
+    </form>
+    <div class="button">
+        <input type="submit" value="Login">
+    </div>
+    <div class="button">
+        <input type="submit" value="Signup">    
+    </div>
+</body>
+<script type="application/javascript">
+    var CLIENT_ID = '5q3jhmk8dj5k69diha60h8nlbu';
+    var IDENTITY_POOL_ID = 'us-east-2:195e1f62-8dd2-431a-8dd0-61822d856379';
+    var REGION = 'us-east-2';
+    var ACCOUNT_ID = '982658172500';
+    AWS.config.region = REGION;
+    AWS.config.credentials = new AWS.CognitoIdentityCredentials({IdentityPoolId: IDENTITY_POOL_ID,});
+    var getIdParams = {
+      IdentityPoolId: IDENTITY_POOL_ID,
+      AccountId: ACCOUNT_ID
+    };
+
+    var cognitoidentity = new AWS.CognitoIdentity({apiVersion: '2014-06-30'});
+
+    cognitoidentity.getId(getIdParams, function(err, data) {
+      if (err) {
+        results.innerHTML = "Error" + err;
+      } else {
+        results.innerHTML =  "Cognito Identity ID is " + data.IdentityId;
+      }
+    });
+</script>
+</html>
