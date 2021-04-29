@@ -16,7 +16,7 @@
         <label for="password">Password:</label>
         <input type="password" id="password" name="password"><br><br>
     </form>
-    <div class="button">
+    <div class="button" onclick="login()">
         <input type="submit" value="Login">
     </div>
     <div class="button">
@@ -29,20 +29,30 @@
     var REGION = 'us-east-2';
     var ACCOUNT_ID = '982658172500';
     AWS.config.region = REGION;
+    
     AWS.config.credentials = new AWS.CognitoIdentityCredentials({IdentityPoolId: IDENTITY_POOL_ID,});
+    var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+
     var getIdParams = {
       IdentityPoolId: IDENTITY_POOL_ID,
       AccountId: ACCOUNT_ID
     };
 
-    var cognitoidentity = new AWS.CognitoIdentity({apiVersion: '2014-06-30'});
+    function login() {
+        let username = document.getElementById("username").value
+        let password = document.getElementById("password").value
+        if(username && password) {
+           let authData = {
+               Username : username,
+               Password : password,
+           };
+           var authenticationDetails = new AWS.CognitoAuth(authData)
+        } else {
+            window.alert("Please enter your username and password!")
+        }
+    }
+    //var cognitoidentity = new AWS.CognitoIdentity({apiVersion: '2014-06-30'});
 
-    cognitoidentity.getId(getIdParams, function(err, data) {
-      if (err) {
-        results.innerHTML = "Errorrdeeer" + err;
-      } else {
-        results.innerHTML =  "Cognito Identity ID is " + data.IdentityId;
-      }
-    });
+
 </script>
 </html>
