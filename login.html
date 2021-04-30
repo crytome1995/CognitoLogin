@@ -1,58 +1,105 @@
 <!DOCTYPE html>
 <html>
-<head>
-<script src="https://sdk.amazonaws.com/js/aws-sdk-2.244.1.min.js"></script>
-</head>
-<style>
-.button {
-    padding: 10px;
-}
-</style>
-<body>
+  <head>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.244.1.min.js"></script>
+    <script src="scripts/amazon-cognito-identity.min.js"></script>
+  </head>
+  <style>
+    .button {
+      padding: 10px;
+    }
+  </style>
+  <body>
     <div id="results">data</div>
     <form action="/action_page.php">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username"><br><br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password"><br><br>
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="username" /><br /><br />
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" /><br /><br />
     </form>
     <div class="button" onclick="login()">
-        <input type="submit" value="Login">
+      <input type="submit" value="Login" />
     </div>
     <div class="button">
-        <input type="submit" value="Signup">    
+      <input type="submit" value="Signup" />
     </div>
-</body>
-<script type="application/javascript">
-    var CLIENT_ID = '5q3jhmk8dj5k69diha60h8nlbu';
-    var IDENTITY_POOL_ID = 'us-east-2:195e1f62-8dd2-431a-8dd0-61822d856379';
-    var REGION = 'us-east-2';
-    var ACCOUNT_ID = '982658172500';
+  </body>
+  <script type="application/javascript">
+    var CLIENT_ID = "6pc97ak94tqu191cjc4vuggpkt";
+    var POOL_ID = "us-east-2_1D0fK5PX0";
+    var IDENTITY_POOL_ID = "us-east-2:195e1f62-8dd2-431a-8dd0-61822d856379";
+    var REGION = "us-east-2";
+    var ACCOUNT_ID = "982658172500";
     AWS.config.region = REGION;
-    
-    AWS.config.credentials = new AWS.CognitoIdentityCredentials({IdentityPoolId: IDENTITY_POOL_ID,});
-    var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
 
-    var getIdParams = {
-      IdentityPoolId: IDENTITY_POOL_ID,
-      AccountId: ACCOUNT_ID
+    // data related to the user pool in ethan_and_tara
+    var poolData = {
+      UserPoolId: POOL_ID,
+      ClientId: CLIENT_ID,
     };
 
     function login() {
-        let username = document.getElementById("username").value
-        let password = document.getElementById("password").value
-        if(username && password) {
-           let authData = {
-               Username : username,
-               Password : password,
-           };
-           var authenticationDetails = new AWS.CognitoAuth(authData)
-        } else {
-            window.alert("Please enter your username and password!")
-        }
+      let username = document.getElementById("username").value;
+      let password = document.getElementById("password").value;
+      if (username && password) {
+        // user pool resource in AWS
+        var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+
+        let authData = {
+          Username: username,
+          Password: password,
+        };
+        var authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails(
+          authData
+        );
+        let userData = {
+          Username: username,
+          Pool: userPool,
+        };
+        var cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
+        let COGNITO_URL = "".concat(
+          "cognito-idp.",
+          REGION,
+          ".amazonaws.com/",
+          POOL_ID
+        );
+        cognitoUser.authenticateUser(authenticationDetails, {
+          onSuccess: function (result) {
+            var accessToken = result.getAccessToken().getJwtToken();
+            console.log(accessToken);
+            AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+              IdentityPoolId: IDENTITY_POOL_ID, // your identity pool id here
+              Logins: {
+                // Change the key below according to the specific region your user pool is in.
+                COGNITO_URL: result.getIdToken().getJwtToken(),
+              },
+            });
+          },
+          onFailure: function (err) {
+            alert(err.message || JSON.stringify(err));
+          },
+          mfaRequired: (codeDeliveryDetails) => {
+            // By this point, Cognito has SMS'd the user
+            // Since we have access to a CognitoUser object during the login process
+            // we have to request the SMS input *here* from the user.
+            // The web examples I've seen suggest having a `confirm()` prompt
+            // or react-native example I've seen suggest similar prompt libraries
+            // for example:
+            // const mfaCode = prompt("Enter your SMS MFA Code");
+            // cognitoUser.sendMFACode(
+            //   mfaCode,
+            //   {
+            //     onSuccess: (result) => "e",
+            //     onFailure: (err) => "e",
+            //   },
+            //   "SMS_MFA"
+            // );
+          },
+        });
+      } else {
+        window.alert("Please enter your username and password!");
+      }
     }
     //var cognitoidentity = new AWS.CognitoIdentity({apiVersion: '2014-06-30'});
-
-
-</script>
+  </script>
 </html>
