@@ -3,6 +3,11 @@
   <head>
     <script src="https://sdk.amazonaws.com/js/aws-sdk-2.244.1.min.js"></script>
     <script src="scripts/amazon-cognito-identity.min.js"></script>
+
+    <script type="module">
+      import { checkLoginSession } from "/scripts/cognito.js";
+      onload = checkLoginSession();
+    </script>
   </head>
   <style>
     .button {
@@ -17,89 +22,8 @@
       <label for="password">Password:</label>
       <input type="password" id="password" name="password" /><br /><br />
     </form>
-    <div class="button" onclick="login()">
+    <div class="button" onclick="getS3()">
       <input type="submit" value="Login" />
     </div>
-    <div class="button">
-      <input type="submit" value="Signup" />
-    </div>
   </body>
-  <script type="application/javascript">
-    var CLIENT_ID = "6pc97ak94tqu191cjc4vuggpkt";
-    var POOL_ID = "us-east-2_1D0fK5PX0";
-    var IDENTITY_POOL_ID = "us-east-2:195e1f62-8dd2-431a-8dd0-61822d856379";
-    var REGION = "us-east-2";
-    var ACCOUNT_ID = "982658172500";
-    AWS.config.region = REGION;
-
-    // data related to the user pool in ethan_and_tara
-    var poolData = {
-      UserPoolId: POOL_ID,
-      ClientId: CLIENT_ID,
-    };
-
-    function login() {
-      let username = document.getElementById("username").value;
-      let password = document.getElementById("password").value;
-      if (username && password) {
-        // user pool resource in AWS
-        var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
-
-        let authData = {
-          Username: username,
-          Password: password,
-        };
-        var authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails(
-          authData
-        );
-        let userData = {
-          Username: username,
-          Pool: userPool,
-        };
-        var cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
-        let COGNITO_URL = "".concat(
-          "cognito-idp.",
-          REGION,
-          ".amazonaws.com/",
-          POOL_ID
-        );
-        cognitoUser.authenticateUser(authenticationDetails, {
-          onSuccess: function (result) {
-            var accessToken = result.getAccessToken().getJwtToken();
-            console.log(accessToken);
-            AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-              IdentityPoolId: IDENTITY_POOL_ID, // your identity pool id here
-              Logins: {
-                // Change the key below according to the specific region your user pool is in.
-                COGNITO_URL: result.getIdToken().getJwtToken(),
-              },
-            });
-          },
-          onFailure: function (err) {
-            alert(err.message || JSON.stringify(err));
-          },
-          mfaRequired: (codeDeliveryDetails) => {
-            // By this point, Cognito has SMS'd the user
-            // Since we have access to a CognitoUser object during the login process
-            // we have to request the SMS input *here* from the user.
-            // The web examples I've seen suggest having a `confirm()` prompt
-            // or react-native example I've seen suggest similar prompt libraries
-            // for example:
-            // const mfaCode = prompt("Enter your SMS MFA Code");
-            // cognitoUser.sendMFACode(
-            //   mfaCode,
-            //   {
-            //     onSuccess: (result) => "e",
-            //     onFailure: (err) => "e",
-            //   },
-            //   "SMS_MFA"
-            // );
-          },
-        });
-      } else {
-        window.alert("Please enter your username and password!");
-      }
-    }
-    //var cognitoidentity = new AWS.CognitoIdentity({apiVersion: '2014-06-30'});
-  </script>
 </html>

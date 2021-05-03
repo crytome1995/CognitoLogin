@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+  </head>
+    <div class="button", id="addButton">
+        <input type="submit" value="add" />
+    </div>
+  </body>
+  <script type="module">
+    import { addCard, getCards } from "/scripts/api-gateway.js";
+    document.getElementById("addButton").onclick = function() {
+        //addCard("mastercard");
+        getCards().then(function (e) {
+            // parse json to javascript object
+            let json = $.parseJSON(e.target.responseText);
+            // itterate over the cards, i is the index, cards is the JS proto object
+            $.each(json ,function(i, cards){
+                // itterate over each card
+                $.each(cards, function(i, card) {
+                    console.log(card.cardName);
+                })
+            });
+        }, function(e){
+        });
+        
+    }
+  </script>
+</html>
