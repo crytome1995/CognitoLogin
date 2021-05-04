@@ -11,7 +11,6 @@ var poolData = {
   UserPoolId: POOL_ID,
   ClientId: CLIENT_ID,
 };
-
 function storeUsername(userAttributes) {
   for (var i = 0; i < userAttributes.length; i++) {
     let name = userAttributes[i].getName();
@@ -68,7 +67,6 @@ export function checkLoginSession() {
               );
             }
           });
-          window.location.href = "/budget.html";
         }
       });
     });
@@ -78,62 +76,65 @@ export function checkLoginSession() {
   }
 }
 
-function login() {
-  let username = document.getElementById("username").value;
-  let password = document.getElementById("password").value;
-  if (username && password) {
-    // user pool resource in AWS
-    var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+export function login() {
+  return new Promise((resolve, reject) => {
+    let username = document.getElementById("username").value;
+    let password = document.getElementById("password").value;
+    if (username && password) {
+      // user pool resource in AWS
+      var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
 
-    let authData = {
-      Username: username,
-      Password: password,
-    };
-    var authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails(
-      authData
-    );
-    let userData = {
-      Username: username,
-      Pool: userPool,
-    };
-    var cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
-    cognitoUser.authenticateUser(authenticationDetails, {
-      onSuccess: function (result) {
-        var accessToken = result.getAccessToken().getJwtToken();
-        result.get;
-        setCookies(accessToken);
-        AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-          IdentityPoolId: IDENTITY_POOL_ID, // your identity pool id here
-          Logins: {
-            // Change the key below according to the specific region your user pool is in.
-            COGNITO_URL: result.getIdToken().getJwtToken(),
-          },
-        });
-        window.location.href = "/budget.html";
-      },
-      onFailure: function (err) {
-        alert(err.message || JSON.stringify(err));
-      },
-      mfaRequired: (codeDeliveryDetails) => {
-        // By this point, Cognito has SMS'd the user
-        // Since we have access to a CognitoUser object during the login process
-        // we have to request the SMS input *here* from the user.
-        // The web examples I've seen suggest having a `confirm()` prompt
-        // or react-native example I've seen suggest similar prompt libraries
-        // for example:
-        // const mfaCode = prompt("Enter your SMS MFA Code");
-        // cognitoUser.sendMFACode(
-        //   mfaCode,
-        //   {
-        //     onSuccess: (result) => "e",
-        //     onFailure: (err) => "e",
-        //   },
-        //   "SMS_MFA"
-        // );
-      },
-    });
-  } else {
-    window.alert("Please enter your username and password!");
-  }
+      let authData = {
+        Username: username,
+        Password: password,
+      };
+      var authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails(
+        authData
+      );
+      let userData = {
+        Username: username,
+        Pool: userPool,
+      };
+      var cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
+      cognitoUser.authenticateUser(authenticationDetails, {
+        onSuccess: function (result) {
+          var accessToken = result.getAccessToken().getJwtToken();
+          result.get;
+          document.cookie = accessToken;
+          AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+            IdentityPoolId: IDENTITY_POOL_ID, // your identity pool id here
+            Logins: {
+              // Change the key below according to the specific region your user pool is in.
+              COGNITO_URL: result.getIdToken().getJwtToken(),
+            },
+          });
+          resolve();
+        },
+        onFailure: function (err) {
+          alert(err.message || JSON.stringify(err));
+          reject(err);
+        },
+        mfaRequired: (codeDeliveryDetails) => {
+          // By this point, Cognito has SMS'd the user
+          // Since we have access to a CognitoUser object during the login process
+          // we have to request the SMS input *here* from the user.
+          // The web examples I've seen suggest having a `confirm()` prompt
+          // or react-native example I've seen suggest similar prompt libraries
+          // for example:
+          // const mfaCode = prompt("Enter your SMS MFA Code");
+          // cognitoUser.sendMFACode(
+          //   mfaCode,
+          //   {
+          //     onSuccess: (result) => "e",
+          //     onFailure: (err) => "e",
+          //   },
+          //   "SMS_MFA"
+          // );
+        },
+      });
+    } else {
+      reject("Invalid username and or password");
+    }
+  });
 }
 //var cognitoidentity = new AWS.CognitoIdentity({apiVersion: '2014-06-30'});
