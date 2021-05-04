@@ -22,19 +22,22 @@ function setHeaders(client) {
 }
 
 export function addCard(cardName) {
-  let url = GATEWAY_URL.concat(POST_CARD_RESOURCE_PATH);
-  let client = new XMLHttpRequest();
-  client.open(POST, url);
-  client = setHeaders(client);
-  client.onreadystatechange = function () {
-    // Call a function when the state changes.
-    if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
-      console.log("ADDED CARD");
-    } else {
-      console.log(this);
-    }
-  };
-  client.send(getAddCardJSON("ethan"));
+  return new Promise(function (resolve, reject) {
+    let url = GATEWAY_URL.concat(POST_CARD_RESOURCE_PATH);
+    let client = new XMLHttpRequest();
+    client.open(POST, url, false);
+    client = setHeaders(client);
+    client.onload = resolve;
+    client.onreadystatechange = function () {
+      // Call a function when the state changes.
+      if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+        console.log("Added card with cardName: " + cardName);
+      } else {
+        console.log(this);
+      }
+    };
+    client.send(getAddCardJSON(cardName));
+  });
 }
 
 export function getCards(callback) {
@@ -45,15 +48,15 @@ export function getCards(callback) {
       encodeURIComponent(cache.getUserName())
     );
     let client = new XMLHttpRequest();
-    client.open(POST, url);
+    client.open(POST, url, false);
     client = setHeaders(client);
     client.onload = resolve;
     client.onreadystatechange = function () {
       // Call a function when the state changes.
       if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
-        console.log(this.responseText);
+        console.log("Got response: " + this.responseText);
       } else {
-        console.log(this);
+        console.log("Error: " + this);
       }
     };
     client.send();

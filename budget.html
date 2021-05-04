@@ -2,29 +2,172 @@
 <html>
   <head>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+              * {
+        box-sizing: border-box;
+      }
+      .openBtn {
+        display: flex;
+        justify-content: left;
+      }
+      .openButton, .deleteButton {
+        border: none;
+        border-radius: 5px;
+        background-color: #1c87c9;
+        color: white;
+        padding: 14px 20px;
+        margin-bottom: 15px;
+        cursor: pointer;
+      }
 
+      .addCardPopup {
+        position: relative;
+        text-align: center;
+        width: 100%;
+      }
+      .formPopup {
+        display: none;
+        position: fixed;
+        left: 45%;
+        top: 5%;
+        transform: translate(-50%, 5%);
+        border: 3px solid #999999;
+        z-index: 9;
+      }
+      .formContainer {
+        max-width: 300px;
+        padding: 20px;
+        background-color: #fff;
+      }
+      .formContainer input[type=text],
+      .formContainer input[type=password] {
+        width: 100%;
+        padding: 15px;
+        margin: 5px 0 20px 0;
+        border: none;
+        background: #eee;
+      }
+      .formContainer input[type=text]:focus,
+      .formContainer input[type=password]:focus {
+        background-color: #ddd;
+        outline: none;
+      }
+      .formContainer .btn {
+        padding: 12px 20px;
+        border: none;
+        background-color: #8ebf42;
+        color: #fff;
+        cursor: pointer;
+        width: 100%;
+        margin-bottom: 15px;
+        opacity: 0.8;
+      }
+      .formContainer .cancel {
+        background-color: #cc0000;
+      }
+      .formContainer .btn:hover,
+      .addButton:hover {
+        opacity: 1;
+      }
+    </style>
   </head>
-    <div class="button", id="addButton">
-        <input type="submit" value="add" />
+    <div>
+        <h1>Main Menu</h1>
+    </div>
+    <div class="addButton", id="addButton">
+        <button class="openButton" onclick="openForm()"><strong>Add Card</strong></button>
+    </div>
+    <div>
+        <button class="deleteButton" onclick="openForm()"><strong>Remove Card</strong></button>
+    </div>
+    <div class="addCardPopup">
+        <div class="formPopup" id="popupForm">
+            <form class="formContainer", id="addCardForm" >
+                <label for="card">Card Name</label>
+                <input type="text" id="cardName" name="card" placeholder="Name of card" />
+                <button id="addCardButton" class="btn" type="submit" data-dismiss="modal">Add card</button>
+                <button type="button" class="btn cancel" onclick="closeForm()" >Close</button>
+            </form>
+        </div>
+    </div>
+    <div class="deleteCardPopup">
+        <div class="formPopupDelete" id="popupFormDelete">
+            <form class="formContainer", id="deleteCardForm" >
+                <label for="card">Card Name</label>
+                <input type="text" id="cardName" name="card" placeholder="Name of card" />
+                <button id="addCardButton" class="btn" type="submit" data-dismiss="modal">Add card</button>
+                <button type="button" class="btn cancel" onclick="closeForm()" >Close</button>
+            </form>
+        </div>
     </div>
   </body>
-  <script type="module">
+    <script type="module">
     import { addCard, getCards } from "/scripts/api-gateway.js";
-    document.getElementById("addButton").onclick = function() {
-        //addCard("mastercard");
-        getCards().then(function (e) {
-            // parse json to javascript object
-            let json = $.parseJSON(e.target.responseText);
+    import { addCardNames, getCardNames, addCardName } from "/scripts/cache.js";
+    import { validateCardName } from "/scripts/util.js"
+    import { checkLoginSession } from "/scripts/cognito.js";
+
+    // store cards in cache
+    onload = loadCards();
+    
+    function loadBudgetSession() {
+        checkLoginSession();
+        loadCards;
+    }
+
+    
+    // take in request response and store card names in local cache
+    function parseCards(json) {
+        if(json) {
+        let currentCards = [];
+        let js = $.parseJSON(json);
             // itterate over the cards, i is the index, cards is the JS proto object
-            $.each(json ,function(i, cards){
+            $.each(js ,function(i, cards){
                 // itterate over each card
                 $.each(cards, function(i, card) {
-                    console.log(card.cardName);
+                    currentCards.push(card.cardName)
                 })
-            });
-        }, function(e){
         });
-        
+        if(currentCards){
+            addCardNames(currentCards)
+            console.log("Stored cards to cache")
+            }
+        }
     }
-  </script>
+
+    // call get cards GW API and store cards in cache
+    function loadCards() {
+        getCards().then(function (e) {
+            // parse json to javascript object
+            parseCards(e.target.responseText);
+        }, function(e){
+        }); 
+
+    }
+    //only close the window if a valid cardName is given
+    document.getElementById("addCardForm").onsubmit = function() {
+        let cardName = document.getElementById("cardName").value.trim();
+        let val = validateCardName(cardName);
+        return val;
+    }
+
+    document.getElementById("addCardButton").onclick =    function() {
+        let cardName = document.getElementById("cardName").value;
+        console.log(cardName);
+        if(cardName) {
+            cardName = cardName.trim();
+            addCard(cardName)
+        } else {
+            alert("Please enter a card name")
+        }
+    }
+    </script>
+    <script>
+    function openForm() {
+        document.getElementById("popupForm").style.display = "block";
+    }
+    function closeForm() {
+        document.getElementById("popupForm").style.display = "none";
+    }
+    </script>
 </html>

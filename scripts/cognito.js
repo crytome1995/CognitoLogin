@@ -31,7 +31,7 @@ export function checkLoginSession() {
     cognitoUser.getSession(function (err, session) {
       if (err) {
         alert(err.message || JSON.stringify(err));
-        return;
+        return false;
       }
       console.log("session validity: " + session.isValid());
       var jwt = session.getIdToken().getJwtToken();
@@ -42,7 +42,7 @@ export function checkLoginSession() {
       cognitoUser.getUserAttributes(function (err, attributes) {
         if (err) {
           console.log(err);
-          return;
+          return false;
         } else {
           storeUsername(attributes);
           AWS.config.credentials = new AWS.CognitoIdentityCredentials({
@@ -55,6 +55,7 @@ export function checkLoginSession() {
           AWS.config.credentials.get(function (err) {
             if (err) {
               console.log(err.message);
+              return false;
             } else {
               console.log(
                 "AWS Access Key: " + AWS.config.credentials.accessKeyId
@@ -71,6 +72,9 @@ export function checkLoginSession() {
         }
       });
     });
+    return true;
+  } else {
+    return false;
   }
 }
 
