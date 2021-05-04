@@ -23,57 +23,57 @@ function storeUsername(userAttributes) {
 
 // check if the user is still valid in cognito
 export function checkLoginSession() {
-  var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
-  var cognitoUser = userPool.getCurrentUser();
-
-  if (cognitoUser != null) {
-    cognitoUser.getSession(function (err, session) {
-      if (err) {
-        alert(err.message || JSON.stringify(err));
-        return false;
-      }
-      console.log("session validity: " + session.isValid());
-      var jwt = session.getIdToken().getJwtToken();
-      var idToken = session.getIdToken().getJwtToken();
-      console.log(session);
-      cache.addIDToken(idToken);
-      // NOTE: getSession must be called to authenticate user before calling getUserAttributes
-      cognitoUser.getUserAttributes(function (err, attributes) {
+  return new Promise((resolve, reject) => {
+    var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+    var cognitoUser = userPool.getCurrentUser();
+    var validSession = false;
+    if (cognitoUser != null) {
+      cognitoUser.getSession(function (err, session) {
         if (err) {
-          console.log(err);
-          return false;
-        } else {
-          storeUsername(attributes);
-          AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-            IdentityPoolId: IDENTITY_POOL_ID,
-            Logins: {
-              // have to pass as string for some reaon...
-              "cognito-idp.us-east-2.amazonaws.com/us-east-2_1D0fK5PX0": jwt,
-            },
-          });
-          AWS.config.credentials.get(function (err) {
-            if (err) {
-              console.log(err.message);
-              return false;
-            } else {
-              console.log(
-                "AWS Access Key: " + AWS.config.credentials.accessKeyId
-              );
-              console.log(
-                "AWS Secret Key: " + AWS.config.credentials.secretAccessKey
-              );
-              console.log(
-                "AWS Session Token: " + AWS.config.credentials.sessionToken
-              );
-            }
-          });
+          alert(err.message || JSON.stringify(err));
+          reject(validSession);
         }
+        console.log("session validity: " + session.isValid());
+        var jwt = session.getIdToken().getJwtToken();
+        var idToken = session.getIdToken().getJwtToken();
+        console.log(session);
+        cache.addIDToken(idToken);
+        // NOTE: getSession must be called to authenticate user before calling getUserAttributes
+        cognitoUser.getUserAttributes(function (err, attributes) {
+          if (err) {
+            console.log(err);
+            reject(validSession);
+          } else {
+            storeUsername(attributes);
+            AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+              IdentityPoolId: IDENTITY_POOL_ID,
+              Logins: {
+                // have to pass as string for some reaon...
+                "cognito-idp.us-east-2.amazonaws.com/us-east-2_1D0fK5PX0": jwt,
+              },
+            });
+            AWS.config.credentials.get(function (err) {
+              if (err) {
+                console.log(err.message);
+              } else {
+                console.log(
+                  "AWS Access Key: " + AWS.config.credentials.accessKeyId
+                );
+                console.log(
+                  "AWS Secret Key: " + AWS.config.credentials.secretAccessKey
+                );
+                console.log(
+                  "AWS Session Token: " + AWS.config.credentials.sessionToken
+                );
+              }
+            });
+            validSession = true;
+          }
+          resolve(validSession);
+        });
       });
-    });
-    return true;
-  } else {
-    return false;
-  }
+    }
+  });
 }
 
 export function login() {
