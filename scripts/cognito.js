@@ -37,6 +37,8 @@ export function checkLoginSession() {
         var jwt = session.getIdToken().getJwtToken();
         var idToken = session.getIdToken().getJwtToken();
         console.log(session);
+        console.log("SDFADSFSA");
+
         cache.addIDToken(idToken);
         // NOTE: getSession must be called to authenticate user before calling getUserAttributes
         cognitoUser.getUserAttributes(function (err, attributes) {
@@ -44,7 +46,10 @@ export function checkLoginSession() {
             console.log(err);
             reject(validSession);
           } else {
+            console.log("SDFADSFSA");
+
             storeUsername(attributes);
+            console.log("SDFADSFSA");
             AWS.config.credentials = new AWS.CognitoIdentityCredentials({
               IdentityPoolId: IDENTITY_POOL_ID,
               Logins: {
@@ -67,6 +72,7 @@ export function checkLoginSession() {
                 );
               }
             });
+            console.log("SETTING TO TRUE");
             validSession = true;
           }
           resolve(validSession);
@@ -78,12 +84,13 @@ export function checkLoginSession() {
 
 export function login() {
   return new Promise((resolve, reject) => {
+    // get user credentials
     let username = document.getElementById("username").value;
     let password = document.getElementById("password").value;
     if (username && password) {
       // user pool resource in AWS
       var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
-
+      // auth map for user
       let authData = {
         Username: username,
         Password: password,
@@ -91,6 +98,7 @@ export function login() {
       var authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails(
         authData
       );
+      // what user pool user belongs to
       let userData = {
         Username: username,
         Pool: userPool,
@@ -137,4 +145,3 @@ export function login() {
     }
   });
 }
-//var cognitoidentity = new AWS.CognitoIdentity({apiVersion: '2014-06-30'});

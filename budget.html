@@ -3,6 +3,7 @@
 
 <head>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="scripts/amazon-cognito-identity.min.js"></script>
   <script src="/scripts/amazon-aws-sdk.min.js"></script>
 
   <style>
@@ -15,7 +16,8 @@
       justify-content: left;
     }
 
-    .openButton {
+    .addButton,
+    .deleteButton {
       border: none;
       border-radius: 5px;
       background-color: #1c87c9;
@@ -87,29 +89,34 @@
 <div>
   <h1>Main Menu</h1>
 </div>
-<div class="addButton" , id="addButton">
-  <button class="openButton" onclick="openForm()"><strong>Add Card</strong></button>
+<div>
+  <button class="addButton" id="addButton" onclick="openFormAddCard()"><strong>Add Card</strong></button>
 </div>
 <div>
-  <button class="deleteButton" onclick="openForm()"><strong>Remove Card</strong></button>
+  <button class="deleteButton" id="deleteButton" onclick="openFormDeleteCard()"><strong>Remove Card</strong></button>
 </div>
 <div class="addCardPopup">
   <div class="formPopupAdd" id="popupForm">
     <form class="formContainer" , id="addCardForm">
       <label for="card">Card Name</label>
       <input type="text" id="cardName" name="card" placeholder="Name of card" />
-      <button id="addCardButton" class="btn" type="submit" data-dismiss="modal">Add card</button>
-      <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+      <button id="addCardButton" class="btn" type="submit" data-dismiss="modal">Add</button>
+      <button type="button" class="btn cancel" onclick="closeFormAddCard()">Close</button>
     </form>
   </div>
 </div>
 <div class="deleteCardPopup">
   <div class="formPopupDelete" id="popupFormDelete">
     <form class="formContainer" , id="deleteCardForm">
-      <label for="card">Card Name</label>
-      <input type="text" id="cardName" name="card" placeholder="Name of card" />
-      <button id="addCardButton" class="btn" type="submit" data-dismiss="modal">Add card</button>
-      <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+      <label for="cardSelect">Card</label>
+      <select name="cardSelect" id="cards">
+        <option value="volvo">Volvo</option>
+        <option value="saab">Saab</option>
+        <option value="opel">Opel</option>
+        <option value="audi">Audi</option>
+      </select>
+      <button id="removeCardButton" class="btn" type="submit" data-dismiss="modal">Remove</button>
+      <button type="button" class="btn cancel" onclick="closeFormDeleteCard()">Close</button>
     </form>
   </div>
 </div>
@@ -121,11 +128,20 @@
   import { checkLoginSession } from "/scripts/cognito.js";
 
   // store cards in cache
-  onload = loadCards();
+  onload = loadBudgetSession();
 
   function loadBudgetSession() {
-    checkLoginSession();
-    loadCards;
+    checkLoginSession().then(
+        function(e){
+            console.log("Session valid")
+            loadCards;
+
+        },
+        function(e){
+            console.log(e);
+            alert("Session expired... returning to login")
+            //window.location.href = "/login.html";
+        });
   }
 
 
@@ -176,11 +192,17 @@
   }
 </script>
 <script>
-  function openForm() {
+  function openFormAddCard() {
     document.getElementById("popupForm").style.display = "block";
   }
-  function closeForm() {
+  function closeFormAddCard() {
     document.getElementById("popupForm").style.display = "none";
+  }
+  function openFormDeleteCard() {
+    document.getElementById("popupFormDelete").style.display = "block";
+  }
+  function closeFormDeleteCard() {
+    document.getElementById("popupFormDelete").style.display = "none";
   }
 </script>
 
