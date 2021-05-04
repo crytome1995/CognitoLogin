@@ -132,16 +132,14 @@
 
   function loadBudgetSession() {
     checkLoginSession().then(
-        function(e){
-            console.log("Session valid")
-            loadCards;
-
-        },
-        function(e){
-            console.log(e);
-            alert("Session expired... returning to login")
-            //window.location.href = "/login.html";
-        });
+      function (e) {
+        loadCards();
+      },
+      function (e) {
+        console.log(e);
+        alert("Session expired... returning to login")
+        window.location.href = "/login.html";
+      });
   }
 
 

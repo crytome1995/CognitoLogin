@@ -37,8 +37,6 @@ export function checkLoginSession() {
         var jwt = session.getIdToken().getJwtToken();
         var idToken = session.getIdToken().getJwtToken();
         console.log(session);
-        console.log("SDFADSFSA");
-
         cache.addIDToken(idToken);
         // NOTE: getSession must be called to authenticate user before calling getUserAttributes
         cognitoUser.getUserAttributes(function (err, attributes) {
@@ -46,10 +44,7 @@ export function checkLoginSession() {
             console.log(err);
             reject(validSession);
           } else {
-            console.log("SDFADSFSA");
-
             storeUsername(attributes);
-            console.log("SDFADSFSA");
             AWS.config.credentials = new AWS.CognitoIdentityCredentials({
               IdentityPoolId: IDENTITY_POOL_ID,
               Logins: {
@@ -72,7 +67,6 @@ export function checkLoginSession() {
                 );
               }
             });
-            console.log("SETTING TO TRUE");
             validSession = true;
           }
           resolve(validSession);
