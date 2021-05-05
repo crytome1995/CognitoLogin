@@ -193,12 +193,14 @@
 </script>
 <script>
   function openFormAddCard() {
+    closeFormDeleteCard();
     document.getElementById("popupForm").style.display = "block";
   }
   function closeFormAddCard() {
     document.getElementById("popupForm").style.display = "none";
   }
   function openFormDeleteCard() {
+    closeFormAddCard();
     document.getElementById("popupFormDelete").style.display = "block";
   }
   function closeFormDeleteCard() {
