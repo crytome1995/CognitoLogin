@@ -5,87 +5,7 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="scripts/amazon-cognito-identity.min.js"></script>
   <script src="/scripts/amazon-aws-sdk.min.js"></script>
-
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    .openBtn {
-      display: flex;
-      justify-content: left;
-    }
-
-    .addButton,
-    .deleteButton {
-      border: none;
-      border-radius: 5px;
-      background-color: #1c87c9;
-      color: white;
-      padding: 14px 20px;
-      margin-bottom: 15px;
-      cursor: pointer;
-    }
-
-    .addCardPopup {
-      position: relative;
-      text-align: center;
-      width: 100%;
-    }
-
-    .formPopupAdd,
-    .formPopupDelete {
-      display: none;
-      position: fixed;
-      left: 45%;
-      top: 5%;
-      transform: translate(-50%, 5%);
-      border: 3px solid #999999;
-      z-index: 9;
-    }
-
-    .formContainer {
-      max-width: 300px;
-      padding: 20px;
-      background-color: #fff;
-    }
-
-    .formContainer input[type=text],
-    .formContainer input[type=password],
-    .formContainer select {
-      width: 100%;
-      padding: 15px;
-      margin: 5px 0 20px 0;
-      border: none;
-      background: #eee;
-    }
-
-    .formContainer input[type=text]:focus,
-    .formContainer input[type=password]:focus {
-      background-color: #ddd;
-      outline: none;
-    }
-
-    .formContainer .btn {
-      padding: 12px 20px;
-      border: none;
-      background-color: #8ebf42;
-      color: #fff;
-      cursor: pointer;
-      width: 100%;
-      margin-bottom: 15px;
-      opacity: 0.8;
-    }
-
-    .formContainer .cancel {
-      background-color: #cc0000;
-    }
-
-    .formContainer .btn:hover,
-    .addButton:hover {
-      opacity: 1;
-    }
-  </style>
+    <link rel="stylesheet" href="/style/budget.css"/>
 </head>
 <div>
   <h1>Main Menu</h1>
@@ -117,9 +37,48 @@
     </form>
   </div>
 </div>
+<div>
+    <table>
+        <tr>
+          <th>Card</th>
+          <th>Business</th>
+          <th>Amount</th>
+        </tr>
+        <tr>
+          <td>Alfreds Futterkiste</td>
+          <td>Maria Anders</td>
+          <td>Germany</td>
+        </tr>
+        <tr>
+          <td>Centro comercial Moctezuma</td>
+          <td>Francisco Chang</td>
+          <td>Mexico</td>
+        </tr>
+        <tr>
+          <td>Ernst Handel</td>
+          <td>Roland Mendel</td>
+          <td>Austria</td>
+        </tr>
+        <tr>
+          <td>Island Trading</td>
+          <td>Helen Bennett</td>
+          <td>UK</td>
+        </tr>
+        <tr>
+          <td>Laughing Bacchus Winecellars</td>
+          <td>Yoshi Tannamuri</td>
+          <td>Canada</td>
+        </tr>
+        <tr>
+          <td>Magazzini Alimentari Riuniti</td>
+          <td>Giovanni Rovelli</td>
+          <td>Italy</td>
+        </tr>
+      </table>
+</div>
 </body>
 <script type="module">
-  import { addCard, getCards } from "/scripts/api-gateway.js";
+  import { addCard, getCards, deleteCard } from "/scripts/api-gateway.js";
   import { addCardNames, getCardNames, addCardName } from "/scripts/cache.js";
   import { validateCardName } from "/scripts/util.js"
   import { checkLoginSession } from "/scripts/cognito.js";
@@ -190,6 +149,19 @@
     return val;
   }
 
+    //only close the window if a valid cardName is given
+    document.getElementById("deleteCardForm").onsubmit = function () {
+        let confirmation = false;
+        let cardName = document.getElementById("cardSelect").value;
+        if(cardName){
+            confirmation = confirm("Are you sure?");
+            if(confirmation){
+                let cardName = document.getElementById("cardSelect").value;
+                    deleteCard(cardName);
+            }
+        }
+    return confirmation;
+  }
 
   document.getElementById("addCardButton").onclick = function () {
     let cardName = document.getElementById("cardName").value;
