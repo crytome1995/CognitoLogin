@@ -51,7 +51,8 @@
     }
 
     .formContainer input[type=text],
-    .formContainer input[type=password] {
+    .formContainer input[type=password],
+    .formContainer select {
       width: 100%;
       padding: 15px;
       margin: 5px 0 20px 0;
@@ -109,11 +110,7 @@
   <div class="formPopupDelete" id="popupFormDelete">
     <form class="formContainer" , id="deleteCardForm">
       <label for="cardSelect">Card</label>
-      <select name="cardSelect" id="cards">
-        <option value="volvo">Volvo</option>
-        <option value="saab">Saab</option>
-        <option value="opel">Opel</option>
-        <option value="audi">Audi</option>
+      <select class="cardSelect" name="cardSelect" id="cardSelect">
       </select>
       <button id="removeCardButton" class="btn" type="submit" data-dismiss="modal">Remove</button>
       <button type="button" class="btn cancel" onclick="closeFormDeleteCard()">Close</button>
@@ -133,7 +130,11 @@
   function loadBudgetSession() {
     checkLoginSession().then(
       function (e) {
-        loadCards();
+        loadCards().then(() => {
+          // set select options
+          setSelectCards();
+        });
+
       },
       function (e) {
         console.log(e);
@@ -142,6 +143,17 @@
       });
   }
 
+  // set the select options based on cards in cache
+  function setSelectCards() {
+    console.log("HERE")
+    var optionsAsString = "";
+    var cards = getCardNames();
+    console.log(cards);
+    for (var i = 0; i < cards.length; i++) {
+      optionsAsString += "<option value='" + cards[i] + "'>" + cards[i] + "</option>";
+    }
+    $('select[name="cardSelect"]').append(optionsAsString);
+  }
 
   // take in request response and store card names in local cache
   function parseCards(json) {
@@ -163,7 +175,7 @@
   }
 
   // call get cards GW API and store cards in cache
-  function loadCards() {
+  async function loadCards() {
     getCards().then(function (e) {
       // parse json to javascript object
       parseCards(e.target.responseText);
@@ -177,6 +189,7 @@
     let val = validateCardName(cardName);
     return val;
   }
+
 
   document.getElementById("addCardButton").onclick = function () {
     let cardName = document.getElementById("cardName").value;
