@@ -40,18 +40,11 @@
 <div>
   <table id="transactionTable">
     <tr>
-      <th><input type="checkbox" id="vehicle1" name="vehicle1" value="Bike"></th>
+      <th><input type="checkbox" id="selectAllCheckbox"></th>
       <th>Date</th>
       <th>Card</th>
       <th>Business</th>
       <th>Amount</th>
-    </tr>
-    <tr>
-      <td><input type="checkbox" id="vehicle1" name="vehicle1" value="Bike"></td>
-      <td>2/4/2029</td>
-      <td>Alfreds Futterkiste</td>
-      <td>Maria Anders</td>
-      <td>Germany</td>
     </tr>
   </table>
 </div>
@@ -59,7 +52,7 @@
 <script type="module">
   import { addCard, getCards, deleteCard } from "/scripts/api-gateway.js";
   import { addCardNames, getCardNames, addCardName } from "/scripts/cache.js";
-  import { validateCardName } from "/scripts/util.js"
+  import { validateCardName,  CheckBoxElement } from "/scripts/util.js"
   import { checkLoginSession } from "/scripts/cognito.js";
 
   // store cards in cache
@@ -82,6 +75,25 @@
       });
   }
 
+  //select all rows action
+  document.getElementById("selectAllCheckbox").onclick = function() {
+      var rows = document.getElementById("transactionTable").rows;
+      for(var i = 1; i < rows.length; i++) {
+            var checkBox = new CheckBoxElement();
+            var row = rows[i].cells;
+            var boxHtml = row[0].innerHTML;
+            console.log(boxHtml);
+            console.log(checkBox.checked);
+            if(boxHtml == checkBox.checked){
+                console.log("UNCHECK");
+                boxHtml = checkBox.unchecked;
+            } else {
+                console.log("CHECK");
+                boxHtml = checkBox.checked;
+            }
+            row[0].innerHTML = boxHtml;
+      }
+  }
   // set the select options based on cards in cache
   function setSelectCards() {
     console.log("HERE")
@@ -112,7 +124,8 @@
   }
 
   function addTransactionRow(transaction) {
-    let checkBoxHTML = "<input type='checkbox' id='vehicle1' name='vehicle1' value='Bike'>"
+      console.log(new CheckBoxElement().unchecked);
+    let checkBoxHTML = new CheckBoxElement().unchecked;
     let table = document.getElementById("transactionTable");
     var row = table.insertRow(-1);
     var checkButton = row.insertCell(0);
@@ -193,12 +206,14 @@
 </script>
 <script>
   function openFormAddCard() {
+    closeFormDeleteCard()
     document.getElementById("popupForm").style.display = "block";
   }
   function closeFormAddCard() {
     document.getElementById("popupForm").style.display = "none";
   }
   function openFormDeleteCard() {
+    closeFormAddCard();
     document.getElementById("popupFormDelete").style.display = "block";
   }
   function closeFormDeleteCard() {
