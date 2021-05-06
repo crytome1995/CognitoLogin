@@ -20,7 +20,6 @@ function storeUsername(userAttributes) {
     }
   }
 }
-
 // check if the user is still valid in cognito
 export function checkLoginSession() {
   return new Promise((resolve, reject) => {
