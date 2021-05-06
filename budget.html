@@ -75,20 +75,16 @@
       });
   }
 
-  //select all rows action
+  //select all rows action flip between all checked and all not checked
   document.getElementById("selectAllCheckbox").onclick = function() {
       var rows = document.getElementById("transactionTable").rows;
       for(var i = 1; i < rows.length; i++) {
             var checkBox = new CheckBoxElement();
             var row = rows[i].cells;
             var boxHtml = row[0].innerHTML;
-            console.log(boxHtml);
-            console.log(checkBox.checked);
             if(boxHtml == checkBox.checked){
-                console.log("UNCHECK");
                 boxHtml = checkBox.unchecked;
             } else {
-                console.log("CHECK");
                 boxHtml = checkBox.checked;
             }
             row[0].innerHTML = boxHtml;
@@ -96,7 +92,6 @@
   }
   // set the select options based on cards in cache
   function setSelectCards() {
-    console.log("HERE")
     var optionsAsString = "";
     var cards = getCardNames();
     console.log(cards);
