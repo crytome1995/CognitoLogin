@@ -31,3 +31,26 @@ export function addCardName(cardName) {
 export function getCardNames() {
   return JSON.parse(localStorage[CARDS]);
 }
+
+export function cardExists(cardName) {
+  let currentCards = JSON.parse(localStorage[CARDS]);;
+  for (let i = 0; i < currentCards.length; i++) {
+    if (currentCards[i] == cardName) {
+      return true;
+    }
+  }
+  return false;
+}
+
+export function removeCardName(cardName) {
+  let currentCards = JSON.parse(localStorage[CARDS]);;
+  for (let i = 0; i < currentCards.length; i++) {
+    if (currentCards[i] == cardName) {
+      console.log("REMOVING CARD: " + currentCards[i]);
+      currentCards.splice(i);
+    }
+
+  }
+  localStorage[CARDS] = JSON.stringify(currentCards);
+
+}

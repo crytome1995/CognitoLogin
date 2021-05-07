@@ -87,7 +87,7 @@ export function deleteCard(cardName) {
         console.log("Got response: " + this.responseText);
       } else {
         console.log("Error: " + this);
-        reject();
+        reject(alert("Failed to remove card with name: " + cardName + " please try again"));
       }
     };
     client.send();

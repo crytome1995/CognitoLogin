@@ -2,68 +2,88 @@
 <html>
 
 <head>
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+    crossorigin="anonymous"></script>
   <script src="scripts/amazon-cognito-identity.min.js"></script>
   <script src="/scripts/amazon-aws-sdk.min.js"></script>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
 
 </head>
 <!-- MODAL ADD CARD -->
 <div class="modal fade" id="modalAddCardForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-aria-hidden="true">
+  aria-hidden="true">
   <div class="modal-dialog" role="document" id="popupForm">
     <div class="modal-content">
-        <!-- HEADER FOR ADD CARD FORM -->
-        <div class="modal-header text-center">
-            <h4 class="modal-title w-100 font-weight-bold">Add Card</h4>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-    <form class="form-group" , id="addCardForm">
+      <!-- HEADER FOR ADD CARD FORM -->
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Add Card</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form class="form-group" , id="addCardForm">
         <div class="form-group">
+          <div class="col-sm-12" style="margin-bottom: 15px;">
             <label for="cardName">Card Name</label>
             <input type="text" id="cardName" name="card" class="form-control" placeholder="Name of card" />
-            <button id="addCardButton" class="btn" type="submit" data-dismiss="modal">Add</button>
+          </div>
+          <div class="col-sm-12">
+            <button id="addCardButton" class="btn btn-primary btn-round mr-md-3 mb-md-0 mb-2" type="submit"
+              data-dismiss="modal">Add</button>
+          </div>
         </div>
-    </form>
+      </form>
     </div>
-</div>
+  </div>
 </div>
 <!-- MODAL ADD CARD END -->
 <!-- MODAL REMOVE CARD -->
 <div class="modal fade" id="modalRemoveCardForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-aria-hidden="true">
+  aria-hidden="true">
   <div class="modal-dialog" role="document" id="popupFormDelete">
     <div class="modal-content">
-        <!-- HEADER FOR REMOVE CARD FORM -->
-        <div class="modal-header text-center">
-            <h4 class="modal-title w-100 font-weight-bold">Remove Card</h4>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
+      <!-- HEADER FOR REMOVE CARD FORM -->
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Remove Card</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form class="form-group" id="deleteCardForm">
+        <div class="form-group">
+          <div class="col-sm-12" style="margin-bottom: 15px;">
+            <label for="cardSelect">Card</label>
+            <select class="cardSelect" name="cardSelect" id="cardSelect">
+            </select>
+            <div class="col-sm-12">
+              <button id="removeCardButton" class="btn btn-primary btn-round mr-md-3 mb-md-0 mb-2" type="submit"
+                data-dismiss="modal">Remove</button>
+            </div>
+          </div>
         </div>
-    <form class="formContainer" , id="deleteCardForm">
-      <label for="cardSelect">Card</label>
-      <select class="cardSelect" name="cardSelect" id="cardSelect">
-      </select>
-      <button id="removeCardButton" class="btn btn-primary btn-round mr-md-3 mb-md-0 mb-2" type="submit" data-dismiss="modal">Remove</button>
-    </form>
+      </form>
+    </div>
   </div>
-</div>
-<!-- MODAL REMOVE CARD END -->
+  <!-- MODAL REMOVE CARD END -->
 
 </div>
 <class class="text-center">
-    <h1>Main Menu</h1>
-    <div>
-        <a href="" class="btn btn-lg btn-success rounded-2 block_button" style="margin-bottom: 15px;" data-toggle="modal" data-target="#modalAddCardForm">Add Card</a>
-    </div>
-    <div>
-        <a href="" class="btn btn-danger rounded-1" data-toggle="modal" data-target="#modalRemoveCardForm">Remove Card</a>
-    </div>
+  <h1>Main Menu</h1>
+  <div>
+    <a href="" class="btn btn-lg btn-success rounded-2 block_button" style="margin-bottom: 15px;" data-toggle="modal"
+      data-target="#modalAddCardForm">Add Card</a>
+  </div>
+  <div>
+    <a href="" class="btn btn-danger rounded-1" data-toggle="modal" data-target="#modalRemoveCardForm">Remove Card</a>
+  </div>
 </class>
 
 <div>
@@ -80,7 +100,7 @@ aria-hidden="true">
 </body>
 <script type="module">
   import { addCard, getCards, deleteCard } from "/scripts/api-gateway.js";
-  import { addCardNames, getCardNames, addCardName } from "/scripts/cache.js";
+  import { addCardNames, getCardNames, addCardName, removeCardName } from "/scripts/cache.js";
   import { validateCardName, CheckBoxElement } from "/scripts/util.js"
   import { checkLoginSession } from "/scripts/cognito.js";
 
@@ -121,6 +141,7 @@ aria-hidden="true">
   }
   // set the select options based on cards in cache
   function setSelectCards() {
+    $('select[name="cardSelect"]').empty();
     var optionsAsString = "";
     var cards = getCardNames();
     console.log(cards);
@@ -197,51 +218,45 @@ aria-hidden="true">
 
   }
   //only close the window if a valid cardName is given
-  document.getElementById("addCardForm").onsubmit = function () {
+  function validCardName() {
+    console.log("VALIDATING");
     let cardName = document.getElementById("cardName").value.trim();
     let val = validateCardName(cardName);
     return val;
   }
 
   //only close the window if a valid cardName is given
-  document.getElementById("deleteCardForm").onsubmit = function () {
+  document.getElementById("removeCardButton").onclick = function () {
+    console.log("REMOVING");
     let confirmation = false;
     let cardName = document.getElementById("cardSelect").value;
     if (cardName) {
       confirmation = confirm("Are you sure?");
       if (confirmation) {
         let cardName = document.getElementById("cardSelect").value;
-        deleteCard(cardName);
+        deleteCard(cardName).then(
+          function (e) {
+            removeCardName(cardName);
+            setSelectCards();
+          },
+          function (e) {
+          });
       }
     }
-    return confirmation;
   }
 
   document.getElementById("addCardButton").onclick = function () {
     let cardName = document.getElementById("cardName").value;
-    console.log(cardName);
+
     if (cardName) {
       cardName = cardName.trim();
-      addCard(cardName)
+      addCard(cardName);
+      addCardName(cardName);
+      setSelectCards();
     } else {
       alert("Please enter a card name")
+      return false;
     }
-  }
-</script>
-<script>
-  function openFormAddCard() {
-    closeFormDeleteCard();
-    document.getElementById("popupForm").style.display = "block";
-  }
-  function closeFormAddCard() {
-    document.getElementById("popupForm").style.display = "none";
-  }
-  function openFormDeleteCard() {
-    closeFormAddCard();
-    document.getElementById("popupFormDelete").style.display = "block";
-  }
-  function closeFormDeleteCard() {
-    document.getElementById("popupFormDelete").style.display = "none";
   }
 </script>
 
