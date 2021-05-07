@@ -214,16 +214,21 @@
       // parse json to javascript object
       parseCards(e.target.responseText);
     }, function (e) {
+        location.reload();
     });
 
   }
   //only close the window if a valid cardName is given
-  function validCardName() {
+  $("#addCardForm").on("submit","form",function(event) {
+    event.preventDefault();
+
     console.log("VALIDATING");
     let cardName = document.getElementById("cardName").value.trim();
     let val = validateCardName(cardName);
+    event.preventDefault();
+
     return val;
-  }
+  });
 
   //only close the window if a valid cardName is given
   document.getElementById("removeCardButton").onclick = function () {
@@ -245,17 +250,22 @@
     }
   }
 
-  document.getElementById("addCardButton").onclick = function () {
+  document.getElementById("addCardButton").onclick = function (e) {
+    e.preventDefault();
     let cardName = document.getElementById("cardName").value;
-
     if (cardName) {
       cardName = cardName.trim();
-      addCard(cardName);
-      addCardName(cardName);
-      setSelectCards();
+      addCard(cardName).then(
+          function (e) {
+            addCardName(cardName);
+            setSelectCards();
+            return true;
+          },
+          function (e) {
+          });
     } else {
-      alert("Please enter a card name")
-      return false;
+        alert("Please enter a card name")
+        return false;
     }
   }
 </script>
