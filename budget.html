@@ -61,12 +61,14 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <form class="form-group" id="deleteCardForm">
+      <form id="deleteCardForm">
         <div class="form-group">
           <div class="col-sm-12" style="margin-bottom: 15px;">
             <label for="cardSelect">Card</label>
-            <select class="cardSelect" name="cardSelect" id="cardSelect">
+            <select class="form-control" name="cardSelect"style="margin-bottom: 15px;" id="cardSelect">
             </select>
+          </div>
+            <div class="form-group">
             <div class="col-sm-12">
               <button id="removeCardButton" class="btn btn-primary btn-round mr-md-3 mb-md-0 mb-2"
                 type="submit">Remove</button>
@@ -76,18 +78,72 @@
       </form>
     </div>
   </div>
-  <!-- MODAL REMOVE CARD END -->
+</div>
+<!-- MODAL REMOVE CARD END -->
+<!-- MODAL ADD TRANSACTION -->
+<div class="modal fade" id="modalAddTransactionForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document" id="popupFormTransaction">
+    <div class="modal-content">
+      <!-- HEADER FOR ADD TRANSACTION FORM -->
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Add Transaction</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form id="addTransactionForm" class="was-validated">
+        <div class="form-group">
+          <div class="col-sm-12" style="margin-bottom: 15px;">
+            <label for="transactionCard">Card</label>
+            <input type="text" id="transactionCard" name="card" class="form-control" placeholder="Name of card" required>
+            <div class="valid-feedback">Valid</div>
+            <div class="invalid-feedback">Please provide a card name</div>
+          </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-12" style="margin-bottom: 15px;">
+              <label for="cardName">Card Name</label>
+              <input type="text" id="cardName" name="card" class="form-control" placeholder="Name of card" required>
+              <div class="valid-feedback">Valid</div>
+              <div class="invalid-feedback">Please provide a card name</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12" style="margin-bottom: 15px;">
+              <label for="cardName">Card Name</label>
+              <input type="text" id="cardName" name="card" class="form-control" placeholder="Name of card" required>
+              <div class="valid-feedback">Valid</div>
+              <div class="invalid-feedback">Please provide a card name</div>
+            </div>
+          </div>
+        <div class="form-group">
+          <div class="col-sm-12">
+            <button id="addTransactionButton" class="btn btn-primary btn-round mr-md-3 mb-md-0 mb-2" type="submit">Add</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<!-- MODAL ADD TRANSACTION END -->
+</head>
+
 
 </div>
 <class class="text-center">
   <h1>Main Menu</h1>
   <div>
-    <a href="" class="btn btn-lg btn-success rounded-2 block_button" style="margin-bottom: 15px;" data-toggle="modal"
+    <a href="" class="btn btn-lg btn-success rounded-2 block_button" style="width: 200px; margin-bottom: 15px;" data-toggle="modal"
       data-target="#modalAddCardForm">Add Card</a>
   </div>
   <div>
+    <a href="" class="btn btn-lg btn-success rounded-2 block_button" data-toggle="modal" data-target="#modalAddTransactionForm"
+      style="width: 200px; margin-bottom: 15px;">Add Transaction</a>
+  </div>
+  <div>
     <a href="" class="btn btn-danger rounded-1" data-toggle="modal" data-target="#modalRemoveCardForm"
-      style="margin-bottom: 15px;">Remove Card</a>
+      style="width: 200px; margin-bottom: 15px;">Remove Card</a>
   </div>
 </class>
 
@@ -112,7 +168,7 @@
   import { addCardNames, getCardNames, addCardName, removeCardName, cardExists } from "/scripts/cache.js";
   import { validateCardName, CheckBoxElement } from "/scripts/util.js"
   import { checkLoginSession } from "/scripts/cognito.js";
-
+  var table;
   // store cards in cache
   onload = loadBudgetSession();
 
@@ -160,7 +216,7 @@
   }
 
   function setTransactionsTable() {
-    var table = $('#transactionTable').DataTable({
+    table = $('#transactionTable').DataTable({
       columnDefs: [
         { orderable: false, targets: 0 }
       ],
@@ -178,8 +234,10 @@
     let lis = [];
     lis.push(transaction);
     lis.push(transaction);
-    for (var i = 0; i < 30; i++) {
-      table.row.add(["e", "e", "e", "e", "e"]).draw(false);
+    table.row.add(["e", "e", "y", "e", "e"]).draw(false);
+
+    for (var i = 0; i < 2; i++) {
+      table.row.add(["e", "e", "x", "e", "e"]).draw(false);
     }
 
   }

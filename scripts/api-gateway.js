@@ -37,6 +37,7 @@ export function addCard(cardName) {
         console.log("Added card with cardName: " + cardName);
       } else {
         console.log(this);
+        alert("Something went wrong when adding card!");
       }
     };
     client.send(getAddCardJSON(cardName));
@@ -61,7 +62,7 @@ export function getCards(callback) {
         console.log("Got response: " + this.responseText);
       } else {
         console.log("Error: " + this);
-        reject();
+        reject(alert("API ERROR on getting cards!"));
       }
     };
     client.send();
@@ -87,7 +88,11 @@ export function deleteCard(cardName) {
         console.log("Got response: " + this.responseText);
       } else {
         console.log("Error: " + this);
-        reject(alert("Failed to remove card with name: " + cardName + " please try again"));
+        reject(
+          alert(
+            "Failed to remove card with name: " + cardName + " please try again"
+          )
+        );
       }
     };
     client.send();
