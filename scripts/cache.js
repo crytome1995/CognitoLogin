@@ -46,11 +46,10 @@ export function removeCardName(cardName) {
   let currentCards = JSON.parse(localStorage[CARDS]);;
   for (let i = 0; i < currentCards.length; i++) {
     if (currentCards[i] == cardName) {
-      console.log("REMOVING CARD: " + currentCards[i]);
-      currentCards.splice(i);
+      currentCards.splice(i, 1);
+      break;
     }
 
   }
   localStorage[CARDS] = JSON.stringify(currentCards);
-
 }
