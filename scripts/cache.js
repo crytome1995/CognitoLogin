@@ -1,6 +1,7 @@
 var USERNAME = "username";
 var ID = "cogID";
 var CARDS = "cards";
+var TRANSACTIONS = "transactions";
 
 export function addUserName(username) {
   localStorage[USERNAME] = username;
@@ -33,7 +34,7 @@ export function getCardNames() {
 }
 
 export function cardExists(cardName) {
-  let currentCards = JSON.parse(localStorage[CARDS]);;
+  let currentCards = JSON.parse(localStorage[CARDS]);
   for (let i = 0; i < currentCards.length; i++) {
     if (currentCards[i] == cardName) {
       return true;
@@ -43,13 +44,20 @@ export function cardExists(cardName) {
 }
 
 export function removeCardName(cardName) {
-  let currentCards = JSON.parse(localStorage[CARDS]);;
+  let currentCards = JSON.parse(localStorage[CARDS]);
   for (let i = 0; i < currentCards.length; i++) {
     if (currentCards[i] == cardName) {
       currentCards.splice(i, 1);
       break;
     }
-
   }
   localStorage[CARDS] = JSON.stringify(currentCards);
+}
+
+export function addTransactions(transactions) {
+  localStorage[TRANSACTIONS] = JSON.stringify(transactions);
+}
+
+export function getTransactions() {
+  return JSON.parse(localStorage[TRANSACTIONS]);
 }

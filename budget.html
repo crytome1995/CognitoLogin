@@ -164,8 +164,8 @@
 </div>
 </body>
 <script type="module">
-  import { addCard, getCards, deleteCard } from "/scripts/api-gateway.js";
-  import { addCardNames, getCardNames, addCardName, removeCardName, cardExists } from "/scripts/cache.js";
+  import { addCard, getCards, deleteCard, getTransactionsByUser, addUserTransaction } from "/scripts/api-gateway.js";
+  import { addCardNames, getCardNames, addCardName, removeCardName, cardExists, addTransactions, getTransactions } from "/scripts/cache.js";
   import { validateCardName, CheckBoxElement } from "/scripts/util.js"
   import { checkLoginSession } from "/scripts/cognito.js";
   var table;
@@ -178,7 +178,11 @@
         loadCards().then(() => {
           // set select options
           setSelectCards();
-          setTransactionsTable();
+          addUserTransaction("ppp","ppp","ppp").then(function (e) {
+            setTransactionsTable();
+
+          });
+          //setTransactionsTable();
         });
       },
       function (e) {
@@ -188,21 +192,6 @@
       });
   }
 
-  //select all rows action flip between all checked and all not checked
-  document.getElementById("selectAllCheckbox").onclick = function () {
-    var rows = document.getElementById("transactionTable").rows;
-    for (var i = 1; i < rows.length; i++) {
-      var checkBox = new CheckBoxElement();
-      var row = rows[i].cells;
-      var boxHtml = row[0].innerHTML;
-      if (boxHtml == checkBox.checked) {
-        boxHtml = checkBox.unchecked;
-      } else {
-        boxHtml = checkBox.checked;
-      }
-      row[0].innerHTML = boxHtml;
-    }
-  }
   // set the select options based on cards in cache
   function setSelectCards() {
     $('select[name="cardSelect"]').empty();
@@ -215,54 +204,32 @@
     $('select[name="cardSelect"]').append(optionsAsString);
   }
 
+  // construct the transaction table
   function setTransactionsTable() {
+    let transactions;
+    // initialize the datatable object
     table = $('#transactionTable').DataTable({
       columnDefs: [
         { orderable: false, targets: 0 }
       ],
       order: [[1, 'asc']]
     });
-    console.log(table);
-    //TODO: add sorting 
-    let transaction = {
-      "date": "123",
-      "cardName": "e",
-      "business": "e",
-      "amount": "1"
-    };
-
-    let lis = [];
-    lis.push(transaction);
-    lis.push(transaction);
-    table.row.add(["e", "e", "y", "e", "e"]).draw(false);
-
-    for (var i = 0; i < 2; i++) {
-      table.row.add(["e", "e", "x", "e", "e"]).draw(false);
-    }
-
-  }
-
-  function addTransactionRow(transaction) {
-    console.log(new CheckBoxElement().unchecked);
-    let checkBoxHTML = new CheckBoxElement().unchecked;
-    let table = document.getElementById("transactionTable");
-    console.log(table);
-    var row = table.insertRow(-1);
-    console.log(row);
-    var checkButton = row.insertCell(0);
-    var date = row.insertCell(1);
-    var card = row.insertCell(2);
-    var business = row.insertCell(3);
-    var amount = row.insertCell(4);
-
-    // set checkbutton 
-    checkButton.innerHTML = checkBoxHTML
-    // set other data
-    date.innerHTML = transaction.date;
-    card.innerHTML = transaction.cardName;
-    business.innerHTML = transaction.business;
-    amount.innerHTML = transaction.amount;
-
+    // call get transactions by user API
+    getTransactionsByUser().then(
+          function (e) {
+            // store the transactions
+            parseTransaction(e.target.responseText);
+            transactions = getTransactions();
+            // construct the table
+            for (var i = 0; i < transactions.length; i++) {
+                let transaction = transactions[i];
+                console.log(transaction);
+                table.row.add([new CheckBoxElement().unchecked, transaction.date, transaction.card, transaction.business, transaction.amount]).draw(false);
+            }
+          },
+          function (e) {
+              console.log(e.target.responseText);
+          });
   }
 
   // take in request response and store card names in local cache
@@ -284,6 +251,25 @@
     }
   }
 
+  // take in a transaction response and add list to cache
+  function parseTransaction(json) {
+    if (json) {
+      let currentTransactions = [];
+      let js = $.parseJSON(json);
+      // itterate over the cards, i is the index, cards is the JS proto object
+      $.each(js, function (i, transactions) {
+        // itterate over each card
+        $.each(transactions, function (i, transaction) {
+            currentTransactions.push(transaction);
+        })
+      });
+      if (currentTransactions) {
+        addTransactions(currentTransactions);
+        console.log("Stored transactions to cache");
+      }
+    }
+  }
+
   // call get cards GW API and store cards in cache
   async function loadCards() {
     getCards().then(function (e) {
@@ -295,6 +281,9 @@
 
   }
 
+  /*
+  *DOM SPECIFIC ACTIONS
+  */
   //only close the window if a valid cardName is given
   document.getElementById("removeCardButton").onclick = function (event) {
     event.preventDefault();
@@ -334,6 +323,22 @@
       } else {
         alert("Card with name " + cardName + " already exists!")
       }
+    }
+  }
+
+    //select all rows action flip between all checked and all not checked
+    document.getElementById("selectAllCheckbox").onclick = function () {
+    var rows = document.getElementById("transactionTable").rows;
+    for (var i = 1; i < rows.length; i++) {
+      var checkBox = new CheckBoxElement();
+      var row = rows[i].cells;
+      var boxHtml = row[0].innerHTML;
+      if (boxHtml == checkBox.checked) {
+        boxHtml = checkBox.unchecked;
+      } else {
+        boxHtml = checkBox.checked;
+      }
+      row[0].innerHTML = boxHtml;
     }
   }
 </script>
