@@ -94,27 +94,33 @@
       </div>
       <form id="addTransactionForm" class="was-validated">
         <div class="form-group">
-          <div class="col-sm-12" style="margin-bottom: 15px;">
-            <label for="transactionCard">Card</label>
-            <input type="text" id="transactionCard" name="card" class="form-control" placeholder="Name of card" required>
-            <div class="valid-feedback">Valid</div>
-            <div class="invalid-feedback">Please provide a card name</div>
-          </div>
-        </div>
-        <div class="form-group">
             <div class="col-sm-12" style="margin-bottom: 15px;">
-              <label for="cardName">Card Name</label>
-              <input type="text" id="cardName" name="card" class="form-control" placeholder="Name of card" required>
+              <label for="business">Business</label>
+              <input type="text" id="business" name="business" class="form-control" placeholder="Place of purchase" required>
               <div class="valid-feedback">Valid</div>
-              <div class="invalid-feedback">Please provide a card name</div>
+              <div class="invalid-feedback">Please provide a place of purchase</div>
             </div>
           </div>
           <div class="form-group">
             <div class="col-sm-12" style="margin-bottom: 15px;">
-              <label for="cardName">Card Name</label>
-              <input type="text" id="cardName" name="card" class="form-control" placeholder="Name of card" required>
+              <label for="amount">Amount</label>
+              <input type="number" step="0.01" id="amount" name="amount" class="form-control" required>
               <div class="valid-feedback">Valid</div>
-              <div class="invalid-feedback">Please provide a card name</div>
+              <div class="invalid-feedback">Please provide an amount spent</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12" style="margin-bottom: 15px;">
+              <label for="cardSelectTransaction">Card</label>
+            <select class="form-control" name="cardSelectTransaction"style="margin-bottom: 15px;" id="cardSelectTransaction">
+            </select>              
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12" style="margin-bottom: 15px;">
+              <label for="dateSelectTransaction">Date</label>
+            <input type="date" class="form-control" name="dateSelectTransaction"style="margin-bottom: 15px;" id="dateSelectTransaction">
+            </input>              
             </div>
           </div>
         <div class="form-group">
@@ -176,13 +182,9 @@
     checkLoginSession().then(
       function (e) {
         loadCards().then(() => {
-          // set select options
-          setSelectCards();
-          addUserTransaction("ppp","ppp","ppp").then(function (e) {
+            // set select options
+            setSelectCards();
             setTransactionsTable();
-
-          });
-          //setTransactionsTable();
         });
       },
       function (e) {
@@ -201,7 +203,8 @@
     for (var i = 0; i < cards.length; i++) {
       optionsAsString += "<option value='" + cards[i] + "'>" + cards[i] + "</option>";
     }
-    $('select[name="cardSelect"]').append(optionsAsString);
+    $('select[name="cardSelect"]').html(optionsAsString);
+    $('select[name="cardSelectTransaction"]').html(optionsAsString);
   }
 
   // construct the transaction table
@@ -214,6 +217,7 @@
       ],
       order: [[1, 'asc']]
     });
+    // add options button
     // call get transactions by user API
     getTransactionsByUser().then(
           function (e) {
@@ -223,14 +227,19 @@
             // construct the table
             for (var i = 0; i < transactions.length; i++) {
                 let transaction = transactions[i];
-                console.log(transaction);
-                table.row.add([new CheckBoxElement().unchecked, transaction.date, transaction.card, transaction.business, transaction.amount]).draw(false);
-            }
+                addTransactionRow(transaction); 
+           }
           },
           function (e) {
               console.log(e.target.responseText);
           });
   }
+
+    function addTransactionRow(transaction){
+        table.row.add([new CheckBoxElement().unchecked, transaction.date, transaction.card, transaction.business, transaction.amount]).draw(false);
+
+    }
+  
 
   // take in request response and store card names in local cache
   function parseCards(json) {
@@ -325,6 +334,25 @@
       }
     }
   }
+
+  document.getElementById("addTransactionButton").onclick = function (event) {
+    event.preventDefault();
+    let business = document.getElementById("business").value;
+    let cardSelectTransaction = document.getElementById("cardSelectTransaction").value;
+    let amount = parseFloat(document.getElementById("amount").value);
+    let date = document.getElementById("dateSelectTransaction").value;
+    if (cardName) {
+      if (!cardExists(cardName)) {
+        addUserTransaction(cardSelectTransaction,business,amount, date).then(function (e) {
+            addTransactionRow(e);
+            $('#modalAddTransactionForm').modal('toggle');
+          },
+          function (e) {
+              console.log(e.target.responseText);
+          });
+    }
+    
+  }}
 
     //select all rows action flip between all checked and all not checked
     document.getElementById("selectAllCheckbox").onclick = function () {

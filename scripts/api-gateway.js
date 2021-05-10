@@ -6,6 +6,7 @@ var CARD = "card";
 var BUSINESS = "business";
 var AMOUNT = "amount";
 var DATE = "date";
+var UUID = "uuid";
 var GATEWAY_URL = "https://ynotyi3yac.execute-api.us-east-2.amazonaws.com/dev/";
 var POST_CARD_RESOURCE_PATH = "card";
 var GET_CARDS_RESOURCE_PATH = "card/";
@@ -22,16 +23,15 @@ function getAddCardJSON(cardName) {
   return JSON.stringify(json);
 }
 
-function getAddTransactionJSON(card, business, amount) {
-  var today = new Date();
-  var date =
-    today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
-  var time =
-    today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-  var dateTime = date + "-" + time;
+function getAddTransactionJSON(card, business, amount, date) {
+  let uuid = "xxxx-xxxx-xxx-xxxx".replace(/[x]/g, (c) => {
+    const r = Math.floor(Math.random() * 16);
+    return r.toString(16);
+  });
   var json = {
     [USER]: cache.getUserName(),
-    [DATE]: dateTime,
+    [UUID]: uuid,
+    [DATE]: date,
     [CARD]: card,
     [BUSINESS]: business,
     [AMOUNT]: amount,
@@ -60,7 +60,7 @@ export function getTransactionsByUser() {
         console.log("Obtained transactions for user!");
       } else {
         console.log(this);
-        alert("Something went wrong when getting transactions!");
+        reject(alert("Something went wrong when getting transactions!"));
       }
     };
     client.send();
@@ -68,10 +68,11 @@ export function getTransactionsByUser() {
 }
 
 // add a new transaction to the table
-export function addUserTransaction(card, business, amount) {
+export function addUserTransaction(card, business, amount, date) {
   return new Promise(function (resolve, reject) {
     let url = GATEWAY_URL.concat(TRANSACTIONS_PATH, "/", cache.getUserName());
     let client = new XMLHttpRequest();
+    let json = getAddTransactionJSON(card, business, amount, date);
     client.open(POST, url, false);
     client = setHeaders(client);
     client.onload = resolve;
@@ -79,12 +80,13 @@ export function addUserTransaction(card, business, amount) {
       // Call a function when the state changes.
       if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
         console.log("Added transaction for user!");
+        resolve(JSON.parse(json));
       } else {
         console.log(this);
-        alert("Something went wrong when adding transactions!");
+        reject(alert("Something went wrong when adding transactions!"));
       }
     };
-    client.send(getAddTransactionJSON(card, business, amount));
+    client.send(json);
   });
 }
 
