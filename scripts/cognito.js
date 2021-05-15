@@ -71,6 +71,8 @@ export function checkLoginSession() {
           resolve(validSession);
         });
       });
+    } else {
+      reject(validSession);
     }
   });
 }
@@ -131,6 +133,23 @@ export function login() {
           //   },
           //   "SMS_MFA"
           // );
+        },
+        newPasswordRequired: function (userAttributes, requiredAttributes) {
+          // User was signed up by an admin and must provide new
+          // password and required attributes, if any, to complete
+          // authentication.
+
+          // the api doesn't accept this field back
+          delete userAttributes.email_verified;
+
+          // unsure about this field, but I don't send this back
+          delete userAttributes.phone_number_verified;
+          // Get these details and call
+          cognitoUser.completeNewPasswordChallenge(
+            password,
+            userAttributes,
+            this
+          );
         },
       });
     } else {

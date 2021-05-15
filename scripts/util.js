@@ -12,11 +12,15 @@ export function validateCardName(cardName) {
 export class CheckBoxElement {
   constructor() {}
 
-  get checked() {
-    return '<input type="checkbox" checked="true" id="transactionCheckBox">';
+  checked(uuid) {
+    return '<input type="checkbox" checked="true" id="' + uuid + '">';
   }
 
-  get unchecked() {
-    return '<input type="checkbox" id="transactionCheckBox">';
+  unchecked(uuid) {
+    return '<input type="checkbox" id="' + uuid + '">';
+  }
+
+  parseUuid(checkboxHTML) {
+    return $(checkboxHTML).attr("id");
   }
 }

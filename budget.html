@@ -15,6 +15,7 @@
   <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/dataTables.bootstrap4.min.css" />
   <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
   <script src="https://cdn.datatables.net/1.10.24/js/dataTables.bootstrap4.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
 </head>
@@ -190,7 +191,7 @@
       function (e) {
         console.log(e);
         alert("Session expired... returning to login")
-        window.location.href = "/login.html";
+        window.location.href = "/index.html";
       });
   }
 
@@ -236,7 +237,7 @@
   }
 
     function addTransactionRow(transaction){
-        table.row.add([new CheckBoxElement().unchecked, transaction.date, transaction.card, transaction.business, transaction.amount]).draw(false);
+        table.row.add([new CheckBoxElement().unchecked(transaction.uuid), transaction.date, transaction.card, transaction.business, transaction.amount]).draw(false);
 
     }
   
@@ -361,10 +362,11 @@
       var checkBox = new CheckBoxElement();
       var row = rows[i].cells;
       var boxHtml = row[0].innerHTML;
-      if (boxHtml == checkBox.checked) {
-        boxHtml = checkBox.unchecked;
+      var uuid = checkBox.parseUuid(boxHtml);
+      if (boxHtml == checkBox.checked(uuid)) {
+        boxHtml = checkBox.unchecked(uuid);
       } else {
-        boxHtml = checkBox.checked;
+        boxHtml = checkBox.checked(uuid);
       }
       row[0].innerHTML = boxHtml;
     }
