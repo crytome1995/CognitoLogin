@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html>
 <style>
+/**
+Set the action button to the left of the search bar
+**/
 .toolbar {
     float: left;
 }
@@ -19,13 +22,15 @@
   <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/dataTables.bootstrap4.min.css" />
   <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
   <script src="https://cdn.datatables.net/1.10.24/js/dataTables.bootstrap4.min.js"></script>
-  <script src="/scripts/budget.js" type="module"></script>
+  <script  src="/scripts/cognito.js" type="module">
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
 </head>
 <!-- MODAL ADD CARD -->
-<div class="modal fade" id="modalAddCardForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+<body>
+<div  class="modal fade" id="modalAddCardForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
   aria-hidden="true">
   <div class="modal-dialog" role="document" id="popupForm">
     <div class="modal-content">
@@ -141,7 +146,6 @@
 <!-- MODAL ADD TRANSACTION END -->
 </head>
 
-
 </div>
 <class class="text-center">
   <h1>Main Menu</h1>
@@ -175,4 +179,6 @@
   </table>
 </div>
 </body>
+<script src="/scripts/budget.js" type="module"></script>
+
 </html>

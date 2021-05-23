@@ -1,21 +1,7 @@
-import {
-  addCard,
-  getCards,
-  deleteCard,
-  getTransactionsByUser,
-  addUserTransaction,
-} from "/scripts/api-gateway.js";
-import {
-  addCardNames,
-  getCardNames,
-  addCardName,
-  removeCardName,
-  cardExists,
-  addTransactions,
-  getTransactions,
-} from "/scripts/cache.js";
-import { validateCardName, CheckBoxElement } from "/scripts/util.js";
-import { checkLoginSession } from "/scripts/cognito.js";
+import { cardsApi, transactionsApi } from "/scripts/api-gateway.js";
+import { cache } from "/scripts/cache.js";
+import { transactionTable } from "/scripts/transaction-table.js";
+import { CheckBoxElement } from "/scripts/util.js";
 
 /**
  * JQUERY CODE HERE
@@ -24,33 +10,21 @@ import { checkLoginSession } from "/scripts/cognito.js";
 /**
  * JQUERY CODE END
  */
-var table;
-
-onload = loadBudgetSession();
-
-function loadBudgetSession() {
-  checkLoginSession().then(
-    function (e) {
-      loadCards().then(() => {
-        // set select options
-        setSelectCards();
-        setTransactionsTable();
-      });
-    },
-    function (e) {
-      console.log(e);
-      alert("Session expired... returning to login");
-      window.location.href = "/index.html";
-    }
-  );
+loadBudgetSession();
+var table = transactionTable();
+async function loadBudgetSession() {
+  loadCards().then(() => {
+    // set select options
+    setSelectCards();
+    setTransactionsTable();
+  });
 }
 
 // set the select options based on cards in cache
 function setSelectCards() {
   $('select[name="cardSelect"]').empty();
   var optionsAsString = "";
-  var cards = getCardNames();
-  console.log(cards);
+  var cards = cache.cards;
   for (var i = 0; i < cards.length; i++) {
     optionsAsString +=
       "<option value='" + cards[i] + "'>" + cards[i] + "</option>";
@@ -62,43 +36,23 @@ function setSelectCards() {
 // construct the transaction table
 function setTransactionsTable() {
   let transactions;
-  // initialize the datatable object
-  table = $("#transactionTable").DataTable({
-    columnDefs: [{ orderable: false, targets: 0 }],
-    dom: 'l<"toolbar">frtip',
-    order: [[1, "asc"]],
-    initComplete: function () {
-      $("div.toolbar").html(
-        '<div class="dropdown" id="actionDropdown">' +
-          '<button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
-          "Actions" +
-          "</button>" +
-          '<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">' +
-          '<a class="dropdown-item" id="removeTransactionAction" href="#">Remove</a>' +
-          '<a class="dropdown-item" href="#">Another action</a>' +
-          '<a class="dropdown-item" href="#">Something else here</a>' +
-          "</div>" +
-          "</div>"
-      );
-    },
-  });
-  // add options button
-  // call get transactions by user API
-  getTransactionsByUser().then(
-    function (e) {
-      // store the transactions
-      parseTransaction(e.target.responseText);
-      transactions = getTransactions();
-      // construct the table
-      for (var i = 0; i < transactions.length; i++) {
-        let transaction = transactions[i];
-        addTransactionRow(transaction);
+  transactionsApi()
+    .getUsersTransactions()
+    .then(
+      function (e) {
+        // store the transactions
+        parseTransaction(e.responseText);
+        transactions = cache.transactions;
+        // construct the table
+        for (var i = 0; i < transactions.length; i++) {
+          let transaction = transactions[i];
+          table.addTransaction(transaction);
+        }
+      },
+      function (e) {
+        console.log(e.responseText);
       }
-    },
-    function (e) {
-      console.log(e.target.responseText);
-    }
-  );
+    );
   // remove row action
   $("#removeTransactionAction").click(function (event) {
     event.preventDefault();
@@ -115,34 +69,9 @@ function setTransactionsTable() {
       }
     }
     if (rowIds.length > 0) {
-      removeSelectedRows(rowIds);
+      table.removeRows(rowIds);
     }
   });
-}
-
-// table functions start ----
-// add a row to the table
-function addTransactionRow(transaction) {
-  table.row
-    .add([
-      new CheckBoxElement().unchecked(transaction.uuid),
-      transaction.date,
-      transaction.card,
-      transaction.business,
-      transaction.amount,
-    ])
-    .draw(false);
-}
-
-// remove a row from the table
-// row id to remove from table
-function removeSelectedRows(ids) {
-  for (var i = 0; i < ids.length; i++) {
-    // get the selectors parent td element
-    let node = $("#" + ids[i]).parent();
-    table.rows(node).remove();
-  }
-  table.draw();
 }
 
 // take in request response and store card names in local cache
@@ -158,7 +87,7 @@ function parseCards(json) {
       });
     });
     if (currentCards) {
-      addCardNames(currentCards);
+      cache.addCard(currentCards);
       console.log("Stored cards to cache");
     }
   }
@@ -177,7 +106,7 @@ function parseTransaction(json) {
       });
     });
     if (currentTransactions) {
-      addTransactions(currentTransactions);
+      cache.transactions = currentTransactions;
       console.log("Stored transactions to cache");
     }
   }
@@ -185,15 +114,17 @@ function parseTransaction(json) {
 
 // call get cards GW API and store cards in cache
 async function loadCards() {
-  getCards().then(
-    function (e) {
-      // parse json to javascript object
-      parseCards(e.target.responseText);
-    },
-    function (e) {
-      location.reload();
-    }
-  );
+  cardsApi()
+    .queryUserCards()
+    .then(
+      function (e) {
+        // parse json to javascript object
+        parseCards(e.responseText);
+      },
+      function (e) {
+        location.reload();
+      }
+    );
 }
 
 /*
@@ -210,7 +141,7 @@ document.getElementById("removeCardButton").onclick = function (event) {
       let cardName = document.getElementById("cardSelect").value;
       deleteCard(cardName).then(
         function (e) {
-          removeCardName(cardName);
+          cache.removeCard(cardName);
           setSelectCards();
           $("#modalRemoveCardForm").modal("toggle");
         },
@@ -229,7 +160,7 @@ document.getElementById("addCardButton").onclick = function (event) {
       cardName = cardName.trim();
       addCard(cardName).then(
         function (e) {
-          addCardName(cardName);
+          cache.addCard(cardName);
           setSelectCards();
           $("#modalAddCardForm").modal("toggle");
         },
@@ -250,7 +181,7 @@ document.getElementById("addCardButton").onclick = function (event) {
       cardName = cardName.trim();
       addCard(cardName).then(
         function (e) {
-          addCardName(cardName);
+          cache.addCard(cardName);
           setSelectCards();
           $("#modalAddCardForm").modal("toggle");
         },
@@ -271,15 +202,17 @@ document.getElementById("addTransactionButton").onclick = function (event) {
   let date = document.getElementById("dateSelectTransaction").value;
   if (cardName) {
     if (!cardExists(cardName)) {
-      addUserTransaction(cardSelectTransaction, business, amount, date).then(
-        function (e) {
-          addTransactionRow(e);
-          $("#modalAddTransactionForm").modal("toggle");
-        },
-        function (e) {
-          console.log(e.target.responseText);
-        }
-      );
+      transactionApi()
+        .addUserTransaction(cardSelectTransaction, business, amount, date)
+        .then(
+          function (e) {
+            table.addTransaction(e);
+            $("#modalAddTransactionForm").modal("toggle");
+          },
+          function (e) {
+            console.log(e.target.responseText);
+          }
+        );
     }
   }
 };

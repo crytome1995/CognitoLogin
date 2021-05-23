@@ -1,15 +1,7 @@
-import * as cache from "./cache.js";
-// make sure the cardname is valid
-export function validateCardName(cardName) {
-  if (cardName) {
-    return true;
-  } else {
-    return false;
-  }
-}
+export { generateUUID, CheckBoxElement, sleep };
 
 // helper class to set select checkbox to selected and not selected
-export class CheckBoxElement {
+class CheckBoxElement {
   constructor() {}
 
   checked(uuid) {
@@ -23,4 +15,16 @@ export class CheckBoxElement {
   parseUuid(checkboxHTML) {
     return $(checkboxHTML).attr("id");
   }
+}
+
+function generateUUID() {
+  let uuid = "xxxx-xxxx-xxx-xxxx".replace(/[x]/g, (c) => {
+    const r = Math.floor(Math.random() * 16);
+    return r.toString(16);
+  });
+  return uuid;
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }

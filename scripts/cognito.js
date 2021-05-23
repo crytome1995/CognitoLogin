@@ -1,4 +1,4 @@
-import * as cache from "./cache.js";
+import { cache } from "./cache.js";
 var CLIENT_ID = "6pc97ak94tqu191cjc4vuggpkt";
 var POOL_ID = "us-east-2_1D0fK5PX0";
 var IDENTITY_POOL_ID = "us-east-2:195e1f62-8dd2-431a-8dd0-61822d856379";
@@ -11,23 +11,25 @@ var poolData = {
   UserPoolId: POOL_ID,
   ClientId: CLIENT_ID,
 };
+
 function storeUsername(userAttributes) {
   for (var i = 0; i < userAttributes.length; i++) {
     let name = userAttributes[i].getName();
     if (name == "email") {
-      cache.addUserName(userAttributes[i].getValue());
+      cache.user = userAttributes[i].getValue();
       break;
     }
   }
 }
+//iife
 // check if the user is still valid in cognito
-export function checkLoginSession() {
-  return new Promise((resolve, reject) => {
+(async function () {
+  return new Promise(async (resolve, reject) => {
     var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
     var cognitoUser = userPool.getCurrentUser();
     var validSession = false;
     if (cognitoUser != null) {
-      cognitoUser.getSession(function (err, session) {
+      await cognitoUser.getSession(function (err, session) {
         if (err) {
           alert(err.message || JSON.stringify(err));
           reject(validSession);
@@ -36,7 +38,7 @@ export function checkLoginSession() {
         var jwt = session.getIdToken().getJwtToken();
         var idToken = session.getIdToken().getJwtToken();
         console.log(session);
-        cache.addIDToken(idToken);
+        cache.token = idToken;
         // NOTE: getSession must be called to authenticate user before calling getUserAttributes
         cognitoUser.getUserAttributes(function (err, attributes) {
           if (err) {
@@ -68,14 +70,24 @@ export function checkLoginSession() {
             });
             validSession = true;
           }
-          resolve(validSession);
+          cache.session = validSession;
+          if (validSession && window.location.href.includes("index.html")) {
+            window.location.href = "/budget.html";
+          }
+          resolve();
         });
       });
     } else {
+      console.log(e);
+      let windowHref = window.location.href;
+      if (!windowHref.includes("index.html")) {
+        alert("Session has expired returning to login!");
+        window.location.href = "/index.html";
+      }
       reject(validSession);
     }
   });
-}
+})();
 
 export function login() {
   return new Promise((resolve, reject) => {
