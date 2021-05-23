@@ -5,6 +5,7 @@ var GATEWAY_URL = "https://ynotyi3yac.execute-api.us-east-2.amazonaws.com/dev/";
 
 var POST = "POST";
 var GET = "GET";
+var DELETE = "DELETE";
 
 // set client headers for interacting with the api gateway
 function setHeaders(client) {
@@ -193,7 +194,7 @@ var transactionsApi = function () {
     let client = new XMLHttpRequest();
     let json = transactionApiModels().addTransacionRequest(
       generateUUID(),
-      cache.getUserName(),
+      userName,
       date,
       card,
       business,
@@ -206,7 +207,7 @@ var transactionsApi = function () {
       client.onreadystatechange = function () {
         if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
           console.log("Added transaction for user: " + userName);
-          resolve(this);
+          resolve(JSON.parse(json));
         } else {
           reject(
             alert(
@@ -221,9 +222,42 @@ var transactionsApi = function () {
     });
   }
 
+  /**
+   * Send a delete request to API gateway to delete a transaction
+   * @param {String} uuid unique id of the transaction
+   */
+  function deleteTransaction(uuid) {
+    let userName = cache.user;
+    console.log("Deleting transaction for user: " + userName);
+    let url = transactionsByUserURI(userName);
+    let client = new XMLHttpRequest();
+    let json = transactionApiModels().deleteTransactionRequest(uuid);
+    client.open(DELETE, url, false);
+    client = setHeaders(client);
+    return new Promise(function (resolve, reject) {
+      client.onload = resolve;
+      client.onreadystatechange = function () {
+        if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+          console.log("Deleted transaction " + uuid + " for user: " + userName);
+          resolve(this);
+        } else {
+          reject(
+            alert(
+              "Failed to delete transaction for user: " +
+                userName +
+                " please try again!"
+            )
+          );
+        }
+      };
+      client.send(json);
+    });
+  }
+
   return {
     addUserTransaction: addUserTransaction,
     getUsersTransactions: getUsersTransactions,
+    deleteTransaction: deleteTransaction,
   };
 };
 
