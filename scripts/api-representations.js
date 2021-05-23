@@ -48,7 +48,19 @@ var transactionApiModels = function () {
     };
     return JSON.stringify(json);
   }
+
+  /**
+   * Construct and return a delete transaction json
+   * @param {String} uuid unique identifier for the transaction
+   */
+  function deleteTransactionRequest(uuid) {
+    let json = {
+      [UUID_KEY]: uuid,
+    };
+    return JSON.stringify(json);
+  }
   return {
     addTransacionRequest: addTransacionRequest,
+    deleteTransactionRequest: deleteTransactionRequest,
   };
 };
