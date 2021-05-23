@@ -57,15 +57,15 @@ function storeUsername(userAttributes) {
               if (err) {
                 console.log(err.message);
               } else {
-                console.log(
-                  "AWS Access Key: " + AWS.config.credentials.accessKeyId
-                );
-                console.log(
-                  "AWS Secret Key: " + AWS.config.credentials.secretAccessKey
-                );
-                console.log(
-                  "AWS Session Token: " + AWS.config.credentials.sessionToken
-                );
+                // console.log(
+                //   "AWS Access Key: " + AWS.config.credentials.accessKeyId
+                // );
+                // console.log(
+                //   "AWS Secret Key: " + AWS.config.credentials.secretAccessKey
+                // );
+                // console.log(
+                //   "AWS Session Token: " + AWS.config.credentials.sessionToken
+                // );
               }
             });
             validSession = true;

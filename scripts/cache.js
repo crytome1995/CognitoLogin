@@ -63,14 +63,14 @@ var cache = {
   get transactions() {
     return JSON.parse(localStorage[TRANSACTIONS]);
   },
-};
 
-export function cardExists(cardName) {
-  let currentCards = JSON.parse(localStorage[CARDS]);
-  for (let i = 0; i < currentCards.length; i++) {
-    if (currentCards[i] == cardName) {
-      return true;
+  cardExists(cardName) {
+    let currentCards = JSON.parse(localStorage[CARDS]);
+    for (let i = 0; i < currentCards.length; i++) {
+      if (currentCards[i] == cardName) {
+        return true;
+      }
     }
-  }
-  return false;
-}
+    return false;
+  },
+};

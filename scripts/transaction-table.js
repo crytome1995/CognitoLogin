@@ -31,6 +31,7 @@ export var transactionTable = function () {
    * @param {JSON} transaction
    */
   function addTransaction(transaction) {
+    console.log(transaction);
     table.row
       .add([
         new CheckBoxElement().unchecked(transaction.uuid),
@@ -42,13 +43,12 @@ export var transactionTable = function () {
       .draw(false);
   }
   /**
-   * Remove all rows with matching id in the list of ids
-   * @param {List} ids unique id of select element that points to a row of the table to remove
+   * Remove row that matches id of select element
+   * @param {String} id unique id of select element that points to a row of the table to remove
    */
-  function removeRows(ids) {
-    for (var i = 0; i < ids.length; i++) {
-      // get the selectors parent td element
-      let node = $("#" + ids[i]).parent();
+  function removeRow(id) {
+    let node = $("#" + id).parent();
+    if (node) {
       table.rows(node).remove();
     }
     table.draw();
@@ -59,10 +59,16 @@ export var transactionTable = function () {
   function getRowCount() {
     return table.rows().length;
   }
+
+  function getRows() {
+    return table.rows();
+  }
+
   init();
   return {
     addTransaction: addTransaction,
-    removeRows: removeRows,
+    removeRow: removeRow,
     rowCount: getRowCount,
+    getRows: getRows,
   };
 };

@@ -3,13 +3,6 @@ import { cache } from "/scripts/cache.js";
 import { transactionTable } from "/scripts/transaction-table.js";
 import { CheckBoxElement } from "/scripts/util.js";
 
-/**
- * JQUERY CODE HERE
- */
-
-/**
- * JQUERY CODE END
- */
 loadBudgetSession();
 var table = transactionTable();
 async function loadBudgetSession() {
@@ -57,19 +50,21 @@ function setTransactionsTable() {
   $("#removeTransactionAction").click(function (event) {
     event.preventDefault();
     // get all colums selected
-    let selectedRows = [];
-    let rowIds = [];
+    let rows = table.getRows();
     //rows data is how we can access the individual row
-    for (var i = 0; i < table.rows().data().length; i++) {
-      let selectColumn = table.rows(i).data()[0][0];
+    for (var i = 0; i < rows.data().length; i++) {
+      let selectColumn = rows.rows(i).data()[0][0];
       let id = $(selectColumn).attr("id");
       if ($("input#" + id + ":checked").length > 0) {
-        rowIds.push(id);
-        selectedRows.push(i);
+        transactionsApi()
+          .deleteTransaction(id)
+          .then(
+            function (e) {
+              table.removeRow(id);
+            },
+            function (e) {}
+          );
       }
-    }
-    if (rowIds.length > 0) {
-      table.removeRows(rowIds);
     }
   });
 }
@@ -87,7 +82,7 @@ function parseCards(json) {
       });
     });
     if (currentCards) {
-      cache.addCard(currentCards);
+      cache.cards = currentCards;
       console.log("Stored cards to cache");
     }
   }
@@ -139,14 +134,16 @@ document.getElementById("removeCardButton").onclick = function (event) {
     confirmation = confirm("Are you sure?");
     if (confirmation) {
       let cardName = document.getElementById("cardSelect").value;
-      deleteCard(cardName).then(
-        function (e) {
-          cache.removeCard(cardName);
-          setSelectCards();
-          $("#modalRemoveCardForm").modal("toggle");
-        },
-        function (e) {}
-      );
+      cardsApi()
+        .removeCard(cardName)
+        .then(
+          function (e) {
+            cache.removeCard(cardName);
+            setSelectCards();
+            $("#modalRemoveCardForm").modal("toggle");
+          },
+          function (e) {}
+        );
     }
   }
 };
@@ -156,37 +153,18 @@ document.getElementById("addCardButton").onclick = function (event) {
   let cardName = document.getElementById("cardName").value;
 
   if (cardName) {
-    if (!cardExists(cardName)) {
+    if (!cache.cardExists(cardName)) {
       cardName = cardName.trim();
-      addCard(cardName).then(
-        function (e) {
-          cache.addCard(cardName);
-          setSelectCards();
-          $("#modalAddCardForm").modal("toggle");
-        },
-        function (e) {}
-      );
-    } else {
-      alert("Card with name " + cardName + " already exists!");
-    }
-  }
-};
-
-document.getElementById("addCardButton").onclick = function (event) {
-  event.preventDefault();
-  let cardName = document.getElementById("cardName").value;
-
-  if (cardName) {
-    if (!cardExists(cardName)) {
-      cardName = cardName.trim();
-      addCard(cardName).then(
-        function (e) {
-          cache.addCard(cardName);
-          setSelectCards();
-          $("#modalAddCardForm").modal("toggle");
-        },
-        function (e) {}
-      );
+      cardsApi()
+        .addUserCard(cardName)
+        .then(
+          function (e) {
+            cache.addCard(cardName);
+            setSelectCards();
+            $("#modalAddCardForm").modal("toggle");
+          },
+          function (e) {}
+        );
     } else {
       alert("Card with name " + cardName + " already exists!");
     }
@@ -201,19 +179,17 @@ document.getElementById("addTransactionButton").onclick = function (event) {
   let amount = parseFloat(document.getElementById("amount").value);
   let date = document.getElementById("dateSelectTransaction").value;
   if (cardName) {
-    if (!cardExists(cardName)) {
-      transactionApi()
-        .addUserTransaction(cardSelectTransaction, business, amount, date)
-        .then(
-          function (e) {
-            table.addTransaction(e);
-            $("#modalAddTransactionForm").modal("toggle");
-          },
-          function (e) {
-            console.log(e.target.responseText);
-          }
-        );
-    }
+    transactionsApi()
+      .addUserTransaction(cardSelectTransaction, business, amount, date)
+      .then(
+        function (json) {
+          table.addTransaction(json);
+          $("#modalAddTransactionForm").modal("toggle");
+        },
+        function (e) {
+          console.log(e.responseText);
+        }
+      );
   }
 };
 //select all rows action flip between all checked and all not checked
