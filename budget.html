@@ -7,6 +7,12 @@ Set the action button to the left of the search bar
 .toolbar {
     float: left;
 }
+.navbar.navbar-1 .navbar-toggler-icon {
+background-image: url('https://mdbcdn.b-cdn.net/img/svg/hamburger6.svg?color=000');
+}
+
+
+
 </style>
 <head>
   <script src="scripts/amazon-cognito-identity.min.js"></script>
@@ -22,14 +28,12 @@ Set the action button to the left of the search bar
   <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/dataTables.bootstrap4.min.css" />
   <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
   <script src="https://cdn.datatables.net/1.10.24/js/dataTables.bootstrap4.min.js"></script>
-  <script  src="/scripts/cognito.js" type="module">
-  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
 </head>
 <!-- MODAL ADD CARD -->
-<body>
+<body style="background-color:lightgray;" class="container-fluid">
 <div  class="modal fade" id="modalAddCardForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
   aria-hidden="true">
   <div class="modal-dialog" role="document" id="popupForm">
@@ -145,40 +149,65 @@ Set the action button to the left of the search bar
 </div>
 <!-- MODAL ADD TRANSACTION END -->
 </head>
-
+<div  class="container-fluid w-100">
+    <div id="cardAddButtonRow" class="row">
+      
+      <div class="col">
+        <!--Navbar-->
+        <nav class="navbar navbar-light amber navbar-1">
+          <!-- Collapse button -->
+          <button class="navbar-toggler" style="outline: none; border: none;" type="button" data-toggle="collapse" data-target="#navbarSupportedContent15"
+          aria-controls="navbarSupportedContent15" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+      
+        <!-- Collapsible content -->
+        <div class="collapse navbar-collapse" id="navbarSupportedContent15">
+          <!-- Links -->
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+              <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Global</a>
+            </li>
+            <li class="nav-item">
+              <a href="" class="btn btn-sm btn-secondary rounded-2 block_button" style="margin-bottom: 15px;" data-toggle="modal"
+              data-target="#modalAddCardForm">Add Card</a>
+            </li>
+            <li class="nav-item">
+              <a href="" class="btn btn-sm btn-danger rounded-1" data-toggle="modal" data-target="#modalRemoveCardForm">Remove Card</a>
+            </li>
+          </ul>
+          <!-- Links -->
+        </div>
+        <!-- Collapsible content -->
+      </nav>
 </div>
-<class class="text-center">
-  <h1>Main Menu</h1>
-  <div>
-    <a href="" class="btn btn-lg btn-success rounded-2 block_button" style="width: 200px; margin-bottom: 15px;" data-toggle="modal"
-      data-target="#modalAddCardForm">Add Card</a>
-  </div>
-  <div>
-    <a href="" class="btn btn-lg btn-success rounded-2 block_button" data-toggle="modal" data-target="#modalAddTransactionForm"
-      style="width: 200px; margin-bottom: 15px;">Add Transaction</a>
-  </div>
-  <div>
-    <a href="" class="btn btn-danger rounded-1" data-toggle="modal" data-target="#modalRemoveCardForm"
-      style="width: 200px; margin-bottom: 15px;">Remove Card</a>
-  </div>
-</class>
-
-<div>
-  <table class="table table-striped table-sm table-hover table-bordered" id="transactionTable">
-    <thead>
-      <tr>
-        <th><input type="checkbox" id="selectAllCheckbox" orderable=false></th>
-        <th>Date</th>
-        <th>Card</th>
-        <th>Business</th>
-        <th>Amount</th>
-      </tr>
-    </thead>
-    <tbody>
-    </tbody>
-  </table>
+<!--/.Navbar-->
+    </div>
+    <div id="addTransactionRow" class="row">
+      <div class="text-center col-sm">
+        <h1 class="text-center" >Main Menu</h1>
+        <a href="" class="btn btn-lg btn-secondary rounded-2 block_button" data-toggle="modal" data-target="#modalAddTransactionForm"
+          style="width: 200px; margin-bottom: 15px;">Add Transaction</a>
+      </div>
+    </div>
+    <div>    
+      <table class="text-center table table-dark table-striped table-sm table-hover table-bordered" id="transactionTable">
+        <thead>
+          <tr>
+            <th><input type="checkbox" id="selectAllCheckbox" orderable=false></th>
+            <th>Date</th>
+            <th>Card</th>
+            <th>Business</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
 </div>
+
 </body>
-<script src="/scripts/budget.js" type="module"></script>
-
+<script type="module" src="/scripts/budget.js"></script>
 </html>

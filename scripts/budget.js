@@ -2,16 +2,25 @@ import { cardsApi, transactionsApi } from "/scripts/api-gateway.js";
 import { cache } from "/scripts/cache.js";
 import { transactionTable } from "/scripts/transaction-table.js";
 import { CheckBoxElement } from "/scripts/util.js";
+import { checkSession } from "/scripts/cognito.js";
 
-loadBudgetSession();
 var table = transactionTable();
-async function loadBudgetSession() {
-  loadCards().then(() => {
-    // set select options
-    setSelectCards();
-    setTransactionsTable();
-  });
-}
+
+// IIFE to check cognito session and setup webpage
+(async function () {
+  checkSession().then(
+    function (e) {
+      loadCards().then(() => {
+        // set select options
+        setSelectCards();
+        setTransactionsTable();
+      });
+    },
+    function (e) {
+      console.log(e);
+    }
+  );
+})();
 
 // set the select options based on cards in cache
 function setSelectCards() {
@@ -125,52 +134,6 @@ async function loadCards() {
 /*
  *DOM SPECIFIC ACTIONS
  */
-//only close the window if a valid cardName is given
-document.getElementById("removeCardButton").onclick = function (event) {
-  event.preventDefault();
-  let confirmation = false;
-  let cardName = document.getElementById("cardSelect").value;
-  if (cardName) {
-    confirmation = confirm("Are you sure?");
-    if (confirmation) {
-      let cardName = document.getElementById("cardSelect").value;
-      cardsApi()
-        .removeCard(cardName)
-        .then(
-          function (e) {
-            cache.removeCard(cardName);
-            setSelectCards();
-            $("#modalRemoveCardForm").modal("toggle");
-          },
-          function (e) {}
-        );
-    }
-  }
-};
-
-document.getElementById("addCardButton").onclick = function (event) {
-  event.preventDefault();
-  let cardName = document.getElementById("cardName").value;
-
-  if (cardName) {
-    if (!cache.cardExists(cardName)) {
-      cardName = cardName.trim();
-      cardsApi()
-        .addUserCard(cardName)
-        .then(
-          function (e) {
-            cache.addCard(cardName);
-            setSelectCards();
-            $("#modalAddCardForm").modal("toggle");
-          },
-          function (e) {}
-        );
-    } else {
-      alert("Card with name " + cardName + " already exists!");
-    }
-  }
-};
-
 document.getElementById("addTransactionButton").onclick = function (event) {
   event.preventDefault();
   let business = document.getElementById("business").value;
@@ -207,4 +170,13 @@ document.getElementById("selectAllCheckbox").onclick = function () {
     }
     row[0].innerHTML = boxHtml;
   }
+
+  $(document).ready(function () {
+    var table = $("#transactionTable").DataTable();
+
+    $("#transactionTable tbody").on("click", "tr", function () {
+      var data = table.row(this).data();
+      alert("You clicked on " + data[0] + "'s row");
+    });
+  });
 };

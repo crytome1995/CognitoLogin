@@ -21,18 +21,19 @@ function storeUsername(userAttributes) {
     }
   }
 }
-//iife
+
 // check if the user is still valid in cognito
-(async function () {
-  return new Promise(async (resolve, reject) => {
+export function checkSession() {
+  return new Promise((resolve, reject) => {
     var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
     var cognitoUser = userPool.getCurrentUser();
     var validSession = false;
     if (cognitoUser != null) {
-      await cognitoUser.getSession(function (err, session) {
+      cognitoUser.getSession(function (err, session) {
         if (err) {
           alert(err.message || JSON.stringify(err));
-          reject(validSession);
+          window.location.href = "/index.html";
+          resolve();
         }
         console.log("session validity: " + session.isValid());
         var jwt = session.getIdToken().getJwtToken();
@@ -43,7 +44,8 @@ function storeUsername(userAttributes) {
         cognitoUser.getUserAttributes(function (err, attributes) {
           if (err) {
             console.log(err);
-            reject(validSession);
+            window.location.href = "/index.html";
+            resolve();
           } else {
             storeUsername(attributes);
             AWS.config.credentials = new AWS.CognitoIdentityCredentials({
@@ -56,6 +58,7 @@ function storeUsername(userAttributes) {
             AWS.config.credentials.get(function (err) {
               if (err) {
                 console.log(err.message);
+                window.location.href = "/index.html";
               } else {
                 // console.log(
                 //   "AWS Access Key: " + AWS.config.credentials.accessKeyId
@@ -73,8 +76,10 @@ function storeUsername(userAttributes) {
           cache.session = validSession;
           if (validSession && window.location.href.includes("index.html")) {
             window.location.href = "/budget.html";
+            resolve();
+          } else {
+            resolve();
           }
-          resolve();
         });
       });
     } else {
@@ -83,11 +88,11 @@ function storeUsername(userAttributes) {
       if (!windowHref.includes("index.html")) {
         alert("Session has expired returning to login!");
         window.location.href = "/index.html";
+        resolve();
       }
-      reject(validSession);
     }
   });
-})();
+}
 
 export function login() {
   return new Promise((resolve, reject) => {

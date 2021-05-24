@@ -13,7 +13,7 @@ export var transactionTable = function () {
       initComplete: function () {
         $("div.toolbar").html(
           '<div class="dropdown" id="actionDropdown">' +
-            '<button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
+            '<button class="btn btn-sm btn-secondary dropdown-toggle" style="margin-bottom:2px" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
             "Actions" +
             "</button>" +
             '<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">' +
@@ -31,7 +31,6 @@ export var transactionTable = function () {
    * @param {JSON} transaction
    */
   function addTransaction(transaction) {
-    console.log(transaction);
     table.row
       .add([
         new CheckBoxElement().unchecked(transaction.uuid),
