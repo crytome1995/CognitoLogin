@@ -1,7 +1,7 @@
 import { cardsApi, transactionsApi } from "/scripts/api-gateway.js";
 import { cache } from "/scripts/cache.js";
 import { transactionTable } from "/scripts/transaction-table.js";
-import { CheckBoxElement } from "/scripts/util.js";
+import { CheckBoxElement, parseCards } from "/scripts/util.js";
 import { checkSession } from "/scripts/cognito.js";
 
 var table = transactionTable();
@@ -10,11 +10,21 @@ var table = transactionTable();
 (async function () {
   checkSession().then(
     function (e) {
-      loadCards().then(() => {
-        // set select options
-        setSelectCards();
-        setTransactionsTable();
-      });
+      cardsApi()
+        .queryUserCards()
+        .then(
+          function (e) {
+            // parse json to javascript object
+            // list of cards
+            let cards = parseCards(e.responseText);
+            if (cards.length > 0) {
+              cache.cards = cards;
+              setSelectCards();
+              setTransactionsTable();
+            }
+          },
+          function (e) {}
+        );
     },
     function (e) {
       console.log(e);
@@ -78,25 +88,6 @@ function setTransactionsTable() {
   });
 }
 
-// take in request response and store card names in local cache
-function parseCards(json) {
-  if (json) {
-    let currentCards = [];
-    let js = $.parseJSON(json);
-    // itterate over the cards, i is the index, cards is the JS proto object
-    $.each(js, function (i, cards) {
-      // itterate over each card
-      $.each(cards, function (i, card) {
-        currentCards.push(card.cardName);
-      });
-    });
-    if (currentCards) {
-      cache.cards = currentCards;
-      console.log("Stored cards to cache");
-    }
-  }
-}
-
 // take in a transaction response and add list to cache
 function parseTransaction(json) {
   if (json) {
@@ -114,21 +105,6 @@ function parseTransaction(json) {
       console.log("Stored transactions to cache");
     }
   }
-}
-
-// call get cards GW API and store cards in cache
-async function loadCards() {
-  cardsApi()
-    .queryUserCards()
-    .then(
-      function (e) {
-        // parse json to javascript object
-        parseCards(e.responseText);
-      },
-      function (e) {
-        location.reload();
-      }
-    );
 }
 
 /*

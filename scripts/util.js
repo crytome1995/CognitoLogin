@@ -1,4 +1,4 @@
-export { generateUUID, CheckBoxElement, sleep };
+export { generateUUID, CheckBoxElement, parseCards };
 
 // helper class to set select checkbox to selected and not selected
 class CheckBoxElement {
@@ -25,6 +25,18 @@ function generateUUID() {
   return uuid;
 }
 
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+// take in request response and store card names in local cache
+function parseCards(json) {
+  let currentCards = [];
+  if (json) {
+    let js = $.parseJSON(json);
+    // itterate over the cards, i is the index, cards is the JS proto object
+    $.each(js, function (i, cards) {
+      // itterate over each card
+      $.each(cards, function (i, card) {
+        currentCards.push(card.cardName);
+      });
+    });
+  }
+  return currentCards;
 }

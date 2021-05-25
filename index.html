@@ -20,9 +20,10 @@
       crossorigin="anonymous"
     ></script>
     <script type="module">
-      import { login } from "/scripts/cognito.js";
+      import { login, checkSession } from "/scripts/cognito.js";
       import { cache } from "/scripts/cache.js";
       console.log(cache.session);
+      checkSession();
       document.getElementById("loginButton").onclick = function () {
         login().then(
           function (e) {
