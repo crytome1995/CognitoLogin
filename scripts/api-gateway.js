@@ -104,7 +104,7 @@ var cardsApi = function () {
   function removeCard(cardName) {
     let userName = cache.user;
     console.log("Deleting card: " + cardName + " for user: " + userName);
-    let url = deleteUserCardURI();
+    let url = deleteUserCardURI(userName, cardName);
     let client = new XMLHttpRequest();
     client.open(POST, url, false);
     client = setHeaders(client);
