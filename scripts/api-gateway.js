@@ -223,6 +223,50 @@ var transactionsApi = function () {
   }
 
   /**
+   *  Edit a transaction and add to table
+   * @param {String} card name of card attached to transaction
+   * @param {String} business place of purchase
+   * @param {Number} amount  amount spent
+   * @param {String} date when transaction occured
+   * @param {String} uuid unique id of transaction
+   */
+  function editUserTransaction(card, business, amount, date, uuid) {
+    let userName = cache.user;
+    console.log("Adding transaction for user: " + userName);
+    let url = addUserTransactionURI(userName);
+    let client = new XMLHttpRequest();
+    let json = transactionApiModels().addTransacionRequest(
+      uuid,
+      userName,
+      date,
+      card,
+      business,
+      amount
+    );
+    console.log(json);
+    client.open(POST, url, false);
+    client = setHeaders(client);
+    return new Promise(function (resolve, reject) {
+      client.onload = resolve;
+      client.onreadystatechange = function () {
+        if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+          console.log("Transaction edited for user: " + userName);
+          resolve(JSON.parse(json));
+        } else {
+          reject(
+            alert(
+              "Failed to edit transactions for user: " +
+                userName +
+                " please try again!"
+            )
+          );
+        }
+      };
+      client.send(json);
+    });
+  }
+
+  /**
    * Send a delete request to API gateway to delete a transaction
    * @param {String} uuid unique id of the transaction
    */
@@ -258,6 +302,7 @@ var transactionsApi = function () {
     addUserTransaction: addUserTransaction,
     getUsersTransactions: getUsersTransactions,
     deleteTransaction: deleteTransaction,
+    editUserTransaction: editUserTransaction,
   };
 };
 

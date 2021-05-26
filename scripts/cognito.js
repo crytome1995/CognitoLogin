@@ -21,7 +21,9 @@ function storeUsername(userAttributes) {
     }
   }
 }
-
+/**
+ * TODO: CHANGE TO RETURNING A TOKEN
+ */
 // check if the user is still valid in cognito
 export function checkSession() {
   return new Promise((resolve, reject) => {

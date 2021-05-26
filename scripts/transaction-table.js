@@ -18,6 +18,7 @@ export var transactionTable = function () {
             "</button>" +
             '<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">' +
             '<a class="dropdown-item" id="removeTransactionAction" href="#">Remove</a>' +
+            '<a class="dropdown-item" id="editTransaction" href="#">Edit</a>' +
             "</div>" +
             "</div>"
         );
@@ -50,6 +51,25 @@ export var transactionTable = function () {
     }
     table.draw();
   }
+
+  /**
+   * Replace the  row with the data from the provided transaction
+   * @param {Object} transaction transaction to put in index
+   */
+  function replaceRow(transaction) {
+    let node = $("#" + transaction.uuid).parent();
+    table
+      .row(node)
+      .data([
+        new CheckBoxElement().unchecked(transaction.uuid),
+        transaction.date,
+        transaction.card,
+        transaction.business,
+        transaction.amount,
+      ])
+      .draw(false);
+  }
+
   /**
    * Return the rows count for the table
    */
@@ -67,5 +87,6 @@ export var transactionTable = function () {
     removeRow: removeRow,
     rowCount: getRowCount,
     getRows: getRows,
+    replaceRow: replaceRow,
   };
 };

@@ -41,7 +41,9 @@ function setSelectCards() {
     optionsAsString +=
       "<option value='" + cards[i] + "'>" + cards[i] + "</option>";
   }
-  $('select[name="cardSelect"]').html(optionsAsString);
+  // edit transaction form
+  $('select[name="cardSelectEditTransaction"]').html(optionsAsString);
+  // transaction form
   $('select[name="cardSelectTransaction"]').html(optionsAsString);
 }
 
@@ -146,13 +148,74 @@ document.getElementById("selectAllCheckbox").onclick = function () {
     }
     row[0].innerHTML = boxHtml;
   }
+};
 
-  $(document).ready(function () {
-    var table = $("#transactionTable").DataTable();
+// allow editting a transaction if and only if one is selected
+$("#editTransaction").click(function (event) {
+  // get all colums selected
+  let rows = table.getRows();
+  let selectedRowCount = 0;
+  let rowSelected;
+  //rows data is how we can access the individual row
+  for (var i = 0; i < rows.data().length; i++) {
+    let selectColumn = rows.rows(i).data()[0][0];
+    let id = $(selectColumn).attr("id");
+    if ($("input#" + id + ":checked").length > 0) {
+      selectedRowCount += 1;
+      // Only fire event if the one row is selected
+      if (selectedRowCount > 1) {
+        return;
+      } else {
+        rowSelected = i;
+      }
+    }
+  }
+  // Do nothing as this is the row with headers
+  /**
+   * 0: select box
+   * 1: date
+   * 2: card name
+   * 3: business
+   * 4: amount
+   */
+  if (rowSelected >= 0) {
+    console.log(rowSelected);
+    let dataList = rows.rows(rowSelected).data()[0];
+    // set fields
+    let selectColumn = dataList[0];
+    let id = $(selectColumn).attr("id");
+    console.log(id);
+    $("#uuidTransaction").text(id);
+    $("#businessEdit").val(dataList[3]);
+    $("#amountEdit").val(dataList[4]);
+    $("#cardSelectEditTransaction").val(dataList[2]);
+    $("#dateSelectEditTransaction").val(dataList[1]);
+    $("#modalEditTransactionForm").modal("show");
+  }
+});
 
-    $("#transactionTable tbody").on("click", "tr", function () {
-      var data = table.row(this).data();
-      alert("You clicked on " + data[0] + "'s row");
-    });
-  });
+// function for editing a transaction
+document.getElementById("editTransactionButton").onclick = function (event) {
+  event.preventDefault();
+  let business = document.getElementById("businessEdit").value;
+  let cardSelectTransaction = document.getElementById(
+    "cardSelectEditTransaction"
+  ).value;
+  let amount = parseFloat(document.getElementById("amountEdit").value);
+  let date = document.getElementById("dateSelectEditTransaction").value;
+  let uuid = $("#uuidTransaction").text();
+  console.log(uuid);
+  if (cardName) {
+    transactionsApi()
+      .editUserTransaction(cardSelectTransaction, business, amount, date, uuid)
+      .then(
+        function (json) {
+          table.replaceRow(json);
+          $("#modalEditTransactionForm").modal("toggle");
+        },
+        function (e) {
+          console.log(e.responseText);
+        }
+      );
+  }
 };

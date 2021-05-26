@@ -37,7 +37,6 @@ function setSelectCards() {
       "<option value='" + cards[i] + "'>" + cards[i] + "</option>";
   }
   $('select[name="cardSelect"]').html(optionsAsString);
-  $('select[name="cardSelectTransaction"]').html(optionsAsString);
 }
 // ADD CARD button action
 document.getElementById("addCardButton").onclick = function (event) {
