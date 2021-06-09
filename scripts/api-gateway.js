@@ -1,8 +1,6 @@
 import { cache } from "./cache.js";
 import { cardApiModels, transactionApiModels } from "./api-representations.js";
 import { generateUUID } from "./util.js";
-var GATEWAY_URL = "https://ynotyi3yac.execute-api.us-east-2.amazonaws.com/dev/";
-
 var POST = "POST";
 var GET = "GET";
 var DELETE = "DELETE";
@@ -14,6 +12,8 @@ function setHeaders(client) {
   return client;
 }
 var cardsApi = function () {
+  var GATEWAY_URL_CARDS =
+    "https://s1hk5ru6h4.execute-api.us-east-2.amazonaws.com/dev/";
   var CARDS_PATH = "card/";
   var CARD_PATH = "card";
   var client;
@@ -22,14 +22,14 @@ var cardsApi = function () {
    * @param {String} username username
    */
   function userCardsURI(username) {
-    return GATEWAY_URL + CARDS_PATH + cache.user;
+    return GATEWAY_URL_CARDS + CARDS_PATH + cache.user;
   }
 
   /**
    * Construct the URI for adding a card for a user
    */
-  function postUserCardURI() {
-    return GATEWAY_URL + CARD_PATH;
+  function postUserCardURI(userName) {
+    return GATEWAY_URL_CARDS + CARD_PATH + "/" + userName;
   }
 
   /**
@@ -38,7 +38,7 @@ var cardsApi = function () {
    * @param {String} cardName  name of card
    */
   function deleteUserCardURI(userName, cardName) {
-    return GATEWAY_URL + CARDS_PATH + userName + "/" + cardName;
+    return GATEWAY_URL_CARDS + CARDS_PATH + userName + "/" + cardName;
   }
 
   /**
@@ -49,7 +49,7 @@ var cardsApi = function () {
     console.log("Obtaining all cards for user: " + userName);
     let url = userCardsURI(encodeURIComponent(userName));
     let client = new XMLHttpRequest();
-    client.open(POST, url, false);
+    client.open(GET, url, false);
     client = setHeaders(client);
     return new Promise(function (resolve, reject) {
       client.onload = resolve;
@@ -57,6 +57,7 @@ var cardsApi = function () {
         // Call a function when the state changes.
         if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
           console.log("Obtained cards for user: " + userName);
+          console.log(this);
           resolve(this);
         } else {
           reject(alert("Failed to get due to : [ " + this.responseText + " ]"));
@@ -73,9 +74,9 @@ var cardsApi = function () {
   function addUserCard(cardName) {
     let userName = cache.user;
     console.log("Adding card: " + cardName + " for user: " + userName);
-    let url = postUserCardURI();
+    let url = postUserCardURI(encodeURIComponent(userName));
     let client = new XMLHttpRequest();
-    let json = cardApiModels().addCardRequest(userName, cardName);
+    let json = cardApiModels().addCardRequest(cardName);
     client.open(POST, url, false);
     client = setHeaders(client);
     return new Promise(function (resolve, reject) {
@@ -106,7 +107,7 @@ var cardsApi = function () {
     console.log("Deleting card: " + cardName + " for user: " + userName);
     let url = deleteUserCardURI(userName, cardName);
     let client = new XMLHttpRequest();
-    client.open(POST, url, false);
+    client.open(DELETE, url, false);
     client = setHeaders(client);
     return new Promise(function (resolve, reject) {
       client.onload = resolve;
@@ -137,17 +138,18 @@ var cardsApi = function () {
 
 var transactionsApi = function () {
   var TRANSACTIONS_PATH = "transactions";
-
+  var GATEWAY_URL_TRANSACTIONS =
+    " https://dau2cuwnfe.execute-api.us-east-2.amazonaws.com/dev/";
   /**
    * Construct the URI for obtaining all transactions for a user
    * @param {String} userName name of the user
    */
   function transactionsByUserURI(userName) {
-    return GATEWAY_URL + TRANSACTIONS_PATH + "/" + userName;
+    return GATEWAY_URL_TRANSACTIONS + TRANSACTIONS_PATH + "/" + userName;
   }
 
   function addUserTransactionURI(userName) {
-    return GATEWAY_URL + TRANSACTIONS_PATH + "/" + userName;
+    return GATEWAY_URL_TRANSACTIONS + TRANSACTIONS_PATH + "/" + userName;
   }
 
   /**

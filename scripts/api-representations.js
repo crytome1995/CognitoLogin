@@ -5,12 +5,10 @@ var cardApiModels = function () {
   var CARD_NAME_KEY = "cardName";
   /**
    * Construct and return a card request json
-   * @param {String} userName
    * @param {String} cardName
    */
-  function addCardRequest(userName, cardName) {
+  function addCardRequest(cardName) {
     let json = {
-      [USER_KEY]: userName,
       [CARD_NAME_KEY]: cardName,
     };
     return JSON.stringify(json);
